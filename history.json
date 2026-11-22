@@ -16,5 +16,79 @@
    "pixabay:210512",
    "pixabay:384102"
   ]
+ },
+ {
+  "date": "2026-11-22T23:08+09:00",
+  "slot": "morning",
+  "category": "care",
+  "topic": "병원 갈 때마다 전쟁인 고양이, 이동장에 스스로 들어가게 만드는 반전 비밀",
+  "title": "고양이 이동장 적응시키는 법",
+  "file": "20261122_2308_morning_고양이_이동장_적응시키는_법.mp4",
+  "video_id": "Vm5SerS3MEM",
+  "cta": "comment",
+  "publish_at": "2026-11-23T07:00:00+09:00",
+  "clips": [
+   "pixabay:370355",
+   "pixabay:123441",
+   "pixabay:130139",
+   "pixabay:46226",
+   "pixabay:379437",
+   "pixabay:855"
+  ]
+ },
+ {
+  "date": "2026-11-22T23:21+09:00",
+  "slot": "noon",
+  "category": "behavior",
+  "topic": "고양이가 굳이 집사 화장실까지 따라오는 의외의 속마음",
+  "title": "고양이 화장실 따라오는 진짜 이유",
+  "file": "20261122_2321_noon_고양이_화장실_따라오는_진짜_이유.mp4",
+  "video_id": "eDyKbJQpb5s",
+  "cta": "save",
+  "publish_at": "2026-11-23T12:00:00+09:00",
+  "clips": [
+   "pixabay:53076",
+   "pixabay:85461",
+   "pixabay:64547",
+   "pixabay:210510",
+   "pixabay:376467",
+   "pixabay:85467"
+  ]
+ },
+ {
+  "date": "2026-11-22T23:31+09:00",
+  "slot": "evening",
+  "category": "jipsa",
+  "topic": "고양이가 박스만 보면 사족을 못 쓰고 무조건 들어가 앉는 진짜 이유",
+  "title": "고양이가 박스에 들어가는 진짜 이유",
+  "file": "20261122_2331_evening_고양이가_박스에_들어가는_진짜_이유.mp4",
+  "video_id": "m4pf3BL85lI",
+  "cta": "debate",
+  "publish_at": "2026-11-23T18:00:00+09:00",
+  "clips": [
+   "pixabay:182225",
+   "pixabay:379433",
+   "pixabay:80886",
+   "pixabay:65123",
+   "pixabay:94092"
+  ]
+ },
+ {
+  "date": "2026-11-22T23:40+09:00",
+  "slot": "night",
+  "category": "behavior",
+  "topic": "고양이가 집사 머리맡이나 발치에서 잠드는 의외의 속마음",
+  "title": "고양이가 머리맡에서 자는 진짜 이유",
+  "file": "20261122_2340_night_고양이가_머리맡에서_자는_진짜_이유.mp4",
+  "video_id": "P-qYqJg1fLY",
+  "cta": "comment",
+  "publish_at": "2026-11-23T21:00:00+09:00",
+  "clips": [
+   "pixabay:35727",
+   "pixabay:33125",
+   "pixabay:170617",
+   "pixabay:367235",
+   "pixabay:39009"
+  ]
  }
 ]
