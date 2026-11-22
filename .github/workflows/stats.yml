@@ -1,0 +1,31 @@
+name: gonyang stats
+
+on:
+  # AI 일터(https://gonyang.vercel.app/office) 구독자 · 조회수를 15분마다 갱신 (제작 중엔 건너뜀).
+  # 표준 라이브러리만 써서 30초 안에 끝남. 공개 저장소라 실행 시간 무제한.
+  schedule:
+    - cron: "7,22,37,52 * * * *"  # 부지런(0,15,30,45분)과 겹치지 않게
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stats
+  cancel-in-progress: true
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Update channel stats
+        env:
+          OFFICE_GIST: ${{ secrets.OFFICE_GIST }}
+          OFFICE_TOKEN: ${{ secrets.OFFICE_TOKEN }}
+          YT_TOKEN: ${{ secrets.YT_TOKEN_GONYANG }}
+        run: python office.py stats

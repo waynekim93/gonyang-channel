@@ -1,0 +1,17 @@
+# 비밀 정보 — 절대 커밋 금지
+.env
+client_secret*.json
+token*.json
+discord*.json
+*.txt.secret
+
+# 생성물/캐시
+.venv/
+__pycache__/
+cache/
+output/
+*.mp4
+*.log
+
+# Vercel 연결 정보
+.vercel/

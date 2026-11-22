@@ -1,0 +1,1580 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>부지런 AI 일터</title>
+<meta name="description" content="부지런 부동산 쇼츠가 만들어지는 과정을 공인중개사무소 AI 직원들이 실시간으로 일하는 모습으로 보여주는 사무실">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#111111">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="부지런 일터">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+@font-face{font-family:"Pretendard";font-weight:800;font-style:normal;font-display:swap;src:url("fonts/Pretendard-ExtraBold.otf") format("opentype")}
+:root{
+  --bg:#0e0e0f; --card:#18181a; --card2:#202023; --line:#2c2c30; --ink:#f5f5f4; --sub:#a1a1a6;
+  --y:#ffd43b; --y2:rgba(255,212,59,.14); --red:#ff6b6b; --green:#4cd38a;
+  --xb:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  --body:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--body);-webkit-tap-highlight-color:transparent}
+h1,h2,.xb{font-family:var(--xb);font-weight:800}
+a{color:inherit}
+.wrap{max-width:1560px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))}
+
+/* ---------- 헤더 ---------- */
+header{display:flex;flex-wrap:wrap;align-items:center;gap:10px 10px;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:11px;margin-right:auto;min-width:0}
+.logo{flex:none;width:42px;height:42px;border-radius:12px;background:#111;border:1px solid #333;display:grid;place-items:center}
+.brand h1{margin:0;font-size:21px;line-height:1.15;letter-spacing:-.2px}
+.brand h1 em{font-style:normal;color:var(--y)}
+.brand small{display:block;color:var(--sub);font-size:12.5px;margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:var(--card);
+  border:1px solid var(--line);font-size:13.5px;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:#777;flex:none}
+.pill.working .dot{background:var(--green);animation:pulse 1.2s infinite}
+.pill.failed .dot{background:var(--red)}
+.pill.idle .dot{background:var(--y)}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(76,211,138,.18)}}
+.btn{cursor:pointer;border:1px solid var(--line);font:inherit;font-size:13.5px;padding:7px 13px;border-radius:999px;background:var(--card);color:var(--ink);
+  text-decoration:none;white-space:nowrap}
+.btn:hover{border-color:#444}
+.btn.pri{background:var(--y);color:#111;border-color:var(--y);font-weight:700}
+.btn:active{transform:translateY(1px)}
+.btn.inst{border-color:rgba(255,212,59,.45)}
+.btn.inst:hover{border-color:var(--y)}
+.btn .lg{display:inline}
+.tip{position:fixed;z-index:9999;left:50%;top:calc(70px + env(safe-area-inset-top));transform:translateX(-50%);width:min(340px,calc(100vw - 32px));
+  padding:14px 16px 13px;border-radius:14px;background:#1d1d20;border:1px solid #3a3a3f;border-top:3px solid var(--y);box-shadow:0 14px 40px rgba(0,0,0,.55);
+  font-size:14px;line-height:1.6;display:none;word-break:keep-all}
+.tip.show{display:block}
+.tip b{color:var(--y)}
+.tip button{float:right;margin:6px 0 0;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--ink);font:inherit;font-size:12.5px;padding:4px 12px;border-radius:999px}
+.banner{display:none;margin-bottom:12px;padding:10px 14px;border-radius:12px;background:var(--card);border:1px solid var(--line);
+  border-left:3px solid var(--y);color:var(--ink);font-size:13.5px;line-height:1.55}
+.banner.show{display:block}
+.banner a{color:var(--y)}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media (max-width:1100px){.main{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:820px){
+  header{gap:8px}
+  .brand{width:100%;margin-right:0}
+  .pill{font-size:12.5px;padding:6px 11px}
+  .btn{font-size:12.5px;padding:6px 11px}
+  #clock{display:none}
+  .btn .lg{display:none}
+}
+
+/* ---------- 사무실 평면 ---------- */
+.viewport{position:relative;border-radius:18px;overflow-x:auto;overflow-y:hidden;background:#161618;border:1px solid var(--line);
+  scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.sizer{position:relative}
+#scene{position:absolute;left:0;top:0;transform-origin:0 0;font-family:var(--body)}
+#scene svg.bg{position:absolute;inset:0}
+#scene svg text{font-family:var(--body)}
+#scene svg text.xb{font-family:var(--xb);font-weight:800}
+
+.night-only{opacity:0;transition:opacity 1s}.day-only{transition:opacity 1s}
+#scene.night .night-only{opacity:1}#scene.night .day-only{opacity:0}
+.zone-dim{position:absolute;background:#08080a;opacity:0;pointer-events:none;transition:opacity .9s;z-index:3000}
+.zone-dim.on{opacity:.5}
+#scene.night .zone-dim.on{opacity:.62}
+.zone-hl{position:absolute;z-index:3001;pointer-events:none;border-radius:2px;transition:box-shadow .5s}
+.zone-hl.on{box-shadow:inset 0 0 0 3px var(--y),inset 0 0 60px rgba(255,212,59,.16)}
+
+.sign{position:absolute;z-index:3100;padding:4px 10px;border-radius:6px;background:#fff;color:#111;font-family:var(--xb);font-weight:800;font-size:14px;
+  box-shadow:0 1px 0 rgba(0,0,0,.25);white-space:nowrap;display:flex;align-items:center;gap:6px;transition:box-shadow .3s}
+.sign small{font-family:var(--body);font-weight:600;font-size:10px;color:#777}
+.sign::before{content:"";width:6px;height:6px;border-radius:50%;background:#c8c8c8;transition:.3s}
+.sign.up{transform:translateY(-100%)}
+.sign.on{background:#111;color:#fff;box-shadow:0 0 0 2px var(--y)}
+.sign.on small{color:#bbb}
+.sign.on::before{background:var(--y);box-shadow:0 0 8px var(--y)}
+
+/* 자리 */
+.seat{position:absolute;width:64px;height:78px}
+.seat.big{width:76px;height:93px}
+.seat .chair{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.seat .chr{position:relative;display:block;width:100%;height:auto;overflow:visible}
+.seat.away .chr{opacity:0}
+.seat.floor.away{visibility:hidden}
+.seat.away .desk.sofa .plate{opacity:0}
+.plate.fp{bottom:auto;top:calc(100% + 3px);z-index:3}
+.al .plate.fp{left:0;transform:none}.ar .plate.fp{left:auto;right:0;transform:none}
+.desk{position:absolute;top:54px;height:34px;z-index:3;border-radius:4px;
+  background:linear-gradient(#e9ded0 0 22px,#9c8268 22px 100%);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.seat.big .desk{top:65px;height:38px;background:linear-gradient(#4a3a30 0 24px,#2b211b 24px 100%)}
+.desk.stand{background:linear-gradient(#d4d7da 0 18px,#6c7277 18px 100%)}
+.desk.counter{background:linear-gradient(#fbfaf7 0 16px,#2a2a2e 16px 100%);border-radius:3px}
+.desk.counter::after{content:"";position:absolute;left:0;right:0;top:16px;height:2px;background:var(--y)}
+.desk.sofa{top:52px;height:30px;border-radius:9px;background:linear-gradient(#5b5d66 0 12px,#44464e 12px 100%);box-shadow:none}
+.mon{position:absolute;right:6px;top:-14px;width:26px;height:18px;border-radius:3px;background:#2b2b30}
+.mon i{position:absolute;inset:2px;border-radius:2px;background:#4a4a52;transition:background .4s}
+.working .mon i{background:#bfe6ff;animation:flick 1.1s infinite}
+@keyframes flick{50%{background:#e6f5ff}}
+.desk .paper{position:absolute;left:7px;top:4px;width:14px;height:10px;background:#fff;border-radius:1px;box-shadow:2px 1px 0 #ddd}
+.desk .mug{position:absolute;left:25px;top:6px;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 2px #333}
+.desk .stamp{position:absolute;left:38px;top:4px;width:9px;height:12px;border-radius:2px 2px 1px 1px;background:#c0392b}
+.plate{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);white-space:nowrap;font-size:9.5px;line-height:1.2;text-align:center;
+  padding:2px 6px;border-radius:4px;background:#111;color:#fff;z-index:2}
+.plate b{font-family:var(--xb);font-weight:800;font-size:11px}
+.plate i{display:block;font-style:normal;font-size:8.5px;color:#a9a9a9}
+.desk:not(.sofa) .plate{bottom:auto;top:calc(100% + 3px)}
+.seat.big .desk .plate{top:auto;bottom:2px}
+.al .desk:not(.sofa) .plate{left:0;transform:none}
+.ar .desk:not(.sofa) .plate{left:auto;right:0;transform:none}
+#scene.bb .bubble{font-size:21px;max-width:320px;padding:9px 13px}
+.plate i.sv{color:var(--y);font-weight:700;margin-top:1px}
+.desk.sofa .plate{bottom:-14px}
+
+.slbl{position:absolute;z-index:4;padding:3px 7px;border-radius:4px;background:#111;color:#fff;font-size:9px;line-height:1.25;white-space:nowrap}
+.slbl b{font-family:var(--xb);font-weight:800;font-size:10px}.slbl i{display:block;font-style:normal;color:#a9a9a9}.slbl i.sv{color:var(--y);font-weight:700}
+#scene.md .slbl{font-size:11.5px}#scene.md .slbl b{font-size:13px}
+#scene.m .slbl{font-size:13px;padding:4px 9px}#scene.m .slbl b{font-size:16px}
+/* 말풍선 */
+.bubble{position:absolute;z-index:30;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%) scale(.6);transform-origin:50% 100%;opacity:0;
+  width:max-content;max-width:230px;padding:7px 11px;border-radius:12px;background:#fff;color:#111;font-size:13.5px;line-height:1.38;font-weight:600;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);transition:transform .25s cubic-bezier(.3,1.6,.6,1),opacity .2s;pointer-events:none;word-break:keep-all}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:#fff}
+.bubble.show{transform:translateX(-50%) scale(1);opacity:1}
+.al .bubble{left:-8px;transform:scale(.6);transform-origin:15% 100%}.al .bubble.show{transform:scale(1)}.al .bubble::after{left:30px}
+.ar .bubble{left:auto;right:-8px;transform:scale(.6);transform-origin:85% 100%}.ar .bubble.show{transform:scale(1)}.ar .bubble::after{left:auto;right:24px}
+.bubble.err{background:#ffe5e5}.bubble.err::after{border-top-color:#ffe5e5}
+.bubble.rep{box-shadow:inset 3px 0 0 var(--y),0 6px 18px rgba(0,0,0,.35)}
+.bubble.small{font-weight:500;color:#444;background:#f4f4f2}.bubble.small::after{border-top-color:#f4f4f2}
+
+/* 장면 글자 크기: 화면에 작게 보일수록 크게 */
+#scene.md .bubble{font-size:17px;max-width:280px;padding:8px 12px}
+#scene.md .sign{font-size:18px}#scene.md .sign small{font-size:12px}
+#scene.md .plate b{font-size:14px}#scene.md .plate{font-size:11.5px}#scene.md .plate i{font-size:10.5px}
+#scene.m .bubble{font-size:25px;max-width:400px;padding:11px 15px;border-radius:18px}
+#scene.m .bubble::after{bottom:-10px;margin-left:-10px;border-width:10px;border-bottom:0}
+#scene.m .sign{font-size:24px;padding:4px 12px;border-radius:9px}
+#scene.m .sign small{font-size:15px}
+#scene.m .plate{font-size:15px;padding:3px 8px}#scene.m .plate b{font-size:19px}#scene.m .plate i{font-size:13px}
+#scene.m .desk.sofa .plate,#scene.md .desk.sofa .plate{padding:1px 4px}
+#scene.m .desk.sofa .plate b{font-size:15px}#scene.md .desk.sofa .plate b{font-size:12.5px}
+
+/* 캐릭터 */
+.chr .bob{animation:bob 3.2s ease-in-out infinite;transform-origin:50% 100%}
+.chr .eyes{animation:blink 4.6s infinite;transform-origin:50% 51px;transform-box:view-box}
+.chr .mouth-o{display:none}
+.talking .chr .mouth-s{display:none}.talking .chr .mouth-o{display:block;animation:talk .28s infinite alternate;transform-origin:50px 63px;transform-box:view-box}
+.working .chr .hand{animation:type .22s infinite alternate}
+.working .chr .hand.r{animation-delay:.11s}
+.working .chr .bob{animation-duration:1.4s}
+.sleeping .chr .bob{animation:none;transform:translateY(9px) rotate(-5deg)}
+.sleeping .chr .eyes{animation:none;transform:scaleY(.12)}
+.chr .zz{opacity:0}
+.sleeping .chr .zz{opacity:1;animation:zz 2.4s infinite}
+.chr .sweat{opacity:0}
+.worried .chr .sweat{opacity:1;animation:sweat 1s infinite}
+@keyframes bob{50%{transform:translateY(-2px)}}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+@keyframes talk{to{transform:scaleY(.45)}}
+@keyframes type{to{transform:translateY(-3px)}}
+@keyframes zz{0%{transform:translate(0,0);opacity:0}30%{opacity:1}100%{transform:translate(8px,-14px);opacity:0}}
+@keyframes sweat{50%{transform:translateY(3px)}}
+.fx{position:absolute;z-index:6;left:42px;top:-8px;font-size:15px;pointer-events:none;opacity:0}
+.working .fx{animation:float 2.2s infinite}
+@keyframes float{0%{transform:translateY(6px);opacity:0}25%{opacity:1}100%{transform:translateY(-24px);opacity:0}}
+
+/* 걷는 직원 */
+.walker{position:absolute;left:0;top:0;width:64px;z-index:3200;will-change:transform}
+.walker .chr{width:100%;height:auto;overflow:visible}
+.walker .leg{animation:step .32s infinite alternate;transform-origin:50% 104px;transform-box:view-box}
+.walker .leg.r{animation-delay:.16s}
+.walker .bob{animation:bob .32s infinite}
+.walker.still .leg,.walker.still .bob{animation:none}
+@keyframes step{from{transform:rotate(14deg)}to{transform:rotate(-14deg)}}
+
+/* 방 소품 애니메이션 */
+#onair rect{transition:fill .3s}
+#scene.rec #onair rect{fill:#e5484d}
+#scene.rec #onair text{fill:#fff}
+#micwait{transition:opacity .3s}#scene.rec #micwait{opacity:0}
+#scene[data-stage="edit"] #playhead{animation:play 3s linear infinite}
+@keyframes play{from{transform:translateX(0)}to{transform:translateX(150px)}}
+#upbar{transform-origin:left;transform-box:fill-box;transform:scaleX(.08)}
+#scene[data-stage="publish"] #upbar{animation:up 2.6s ease-in-out infinite}
+@keyframes up{from{transform:scaleX(.05)}to{transform:scaleX(1)}}
+#flash{opacity:0}
+#scene[data-stage="footage"] #flash{animation:flash 2.2s infinite}
+@keyframes flash{0%,82%,100%{opacity:0}86%{opacity:.95}}
+#scene[data-stage="footage"] .pin{animation:pin 1s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes pin{to{transform:translateY(-3px)}}
+#scene[data-stage="review"] #seal{animation:seal 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes seal{0%,60%,100%{transform:translateY(0)}75%{transform:translateY(5px)}}
+#scene[data-stage="idea"] #ticket{animation:led .9s infinite}
+@keyframes led{50%{opacity:.3}}
+.steam{animation:steam 2.4s infinite;opacity:0}
+@keyframes steam{0%{transform:translateY(0);opacity:0}40%{opacity:.7}100%{transform:translateY(-12px);opacity:0}}
+
+/* 간판 전광판 */
+.ledb{position:absolute;z-index:3050;border-radius:6px;padding:3px;background:#050505;box-shadow:0 0 0 1px #2a2a2a}
+.ledb .scr{position:relative;height:100%;border-radius:3px;overflow:hidden;background:#0a0a0a}
+.ledb .scr::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle,transparent 45%,rgba(10,10,10,.6) 75%) 0 0/3px 3px}
+.ledb .run{position:absolute;left:0;top:4px;display:flex;white-space:nowrap;font-family:var(--xb);font-weight:800;font-size:16px;color:var(--y);
+  text-shadow:0 0 4px rgba(255,212,59,.8),0 0 10px rgba(255,190,40,.4);animation:ledrun 26s linear infinite}
+.ledb .run span{padding-right:48px}
+.ledb .run b{color:#fff}
+.ledb .gbar{position:absolute;left:5px;right:5px;bottom:4px;height:4px;border-radius:3px;background:#262626}
+.ledb .gbar i{display:block;height:100%;width:0;border-radius:3px;background:var(--y);box-shadow:0 0 6px var(--y);transition:width 1s}
+@keyframes ledrun{to{transform:translateX(-50%)}}
+#scene.m .ledb .run{font-size:26px;top:6px}
+#scene.m .ledb .run span{padding-right:70px}
+#scene.m .ledb .gbar{height:6px;bottom:6px}
+.trophy-n{position:absolute;z-index:8;font-family:var(--xb);font-weight:800;font-size:15px;color:var(--y);pointer-events:none;transform:translateX(-50%);white-space:nowrap}
+#scene.m .trophy-n{font-size:20px}
+.confetti{position:absolute;width:8px;height:12px;border-radius:2px;z-index:3500;pointer-events:none;animation:conf 1.8s ease-out forwards}
+@keyframes conf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+
+/* 쇼윈도 매물 */
+.mc{position:absolute;z-index:3060;background:#fff;color:#111;border-radius:3px;padding:5px 8px 6px;box-shadow:0 2px 6px rgba(0,0,0,.25);overflow:hidden;
+  display:flex;flex-direction:column;justify-content:space-between}
+.mc .mh{display:flex;align-items:center;gap:6px;font-size:9px;color:#666;white-space:nowrap}
+.mc .mh span{font-family:var(--xb);font-weight:800;color:#111;padding:0 5px;border-radius:2px;background:var(--y);font-size:9px;line-height:1.5}
+.mc .mh em{font-style:normal;margin-left:auto;font-weight:700;color:#111}
+.mc b{display:block;font-family:var(--xb);font-weight:800;font-size:11px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc i{font-style:normal;font-size:9px;color:#777;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc.done .mh span{background:#111;color:#fff}
+.mc.done::after{content:"계약완료";position:absolute;right:8px;bottom:5px;font-family:var(--xb);font-weight:800;font-size:9px;color:#d63b3b;
+  border:1.5px solid #d63b3b;border-radius:3px;padding:0 3px;transform:rotate(-8deg);opacity:.85;background:#fff}
+.mc.ph{background:rgba(255,255,255,.55);color:#555}.mc.ph .mh span{background:#ccc}
+#scene.md .mc .mh,#scene.md .mc .mh span,#scene.md .mc i{font-size:12px}#scene.md .mc b{font-size:14.5px}#scene.md .mc.done::after{font-size:12px}
+#scene.m .mc{padding:7px 10px 8px}
+#scene.m .mc .mh,#scene.m .mc .mh span,#scene.m .mc i{font-size:15px}#scene.m .mc b{font-size:19px}#scene.m .mc.done::after{font-size:14px}
+.open{position:absolute;z-index:3060;transform:translateX(-50%);font-family:var(--xb);font-weight:800;font-size:11px;letter-spacing:1px;padding:2px 8px;border-radius:4px;
+  background:#0a0a0a;color:#666;border:1px solid #333;white-space:nowrap}
+.open.on{color:var(--y);border-color:var(--y);text-shadow:0 0 6px rgba(255,212,59,.8);box-shadow:0 0 10px rgba(255,212,59,.25)}
+#scene.md .open{font-size:14px}#scene.m .open{font-size:18px}
+
+/* ---------- 사이드 ---------- */
+.side{display:grid;gap:14px;grid-template-columns:minmax(0,1fr);min-width:0}
+@media (max-width:1100px) and (min-width:700px){.side{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.side .wide{grid-column:1/-1}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 16px;min-width:0}
+.card h2{margin:0 0 11px;font-size:16px;display:flex;align-items:center;gap:7px}
+.card h2 .cnt{margin-left:auto;font-family:var(--body);font-weight:500;font-size:12px;color:var(--sub)}
+.empty{font-size:13.5px;color:var(--sub);line-height:1.6}
+.empty b{color:var(--ink)}
+.chip{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--y2);color:var(--y);margin-right:5px;font-weight:700}
+.proj .meta{font-size:12.5px;color:var(--sub);margin-bottom:4px}
+.proj .ttl{font-family:var(--xb);font-weight:800;font-size:17px;line-height:1.35;margin:4px 0 6px;word-break:keep-all}
+.proj .tp{font-size:13px;color:var(--sub);word-break:keep-all;line-height:1.5}
+.steps{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin:13px 0 4px}
+.st{text-align:center;font-size:10.5px;color:var(--sub);white-space:nowrap}
+.st i{display:grid;place-items:center;margin:0 auto 4px;width:28px;height:28px;border-radius:50%;background:var(--card2);font-style:normal;font-size:13px;
+  filter:grayscale(1);opacity:.5;transition:.3s;border:1px solid var(--line)}
+.st.done i{filter:none;opacity:1;border-color:#3b3b40}
+.st.now i{filter:none;opacity:1;border-color:var(--y);box-shadow:0 0 0 3px rgba(255,212,59,.18);animation:pop 1s infinite alternate}
+.st.now{color:var(--ink);font-weight:700}
+@keyframes pop{to{transform:scale(1.08)}}
+.bar{height:6px;border-radius:9px;background:var(--card2);overflow:hidden;margin-top:8px}
+.bar b{display:block;height:100%;width:0;background:var(--y);transition:width .6s}
+
+/* 매물 게시판 */
+.listings{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lst{position:relative;display:grid;grid-template-columns:auto 1fr;gap:3px 11px;align-items:center;padding:9px 11px;border-radius:10px;background:#fff;color:#111}
+.lst .no{grid-row:span 2;display:grid;place-items:center;width:44px;height:44px;border-radius:8px;background:#111;color:#fff;font-family:var(--xb);font-weight:800;font-size:12px;line-height:1.15;text-align:center}
+.lst .no small{display:block;font-size:9.5px;color:var(--y);font-family:var(--body);font-weight:700}
+.lst .t{font-family:var(--xb);font-weight:800;font-size:13.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lst .t a{text-decoration:none}.lst .t a:hover{text-decoration:underline}
+.lst .s{font-size:11.5px;color:#666;display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden}
+.lst .s .c{font-weight:700;color:#111;padding:0 6px;border-radius:3px;background:#f1f1ef}
+.lst.todo{background:var(--card2);color:var(--ink)}.lst.todo .no{background:#2c2c30}.lst.todo .s{color:var(--sub)}
+.lst.done{background:#f4f4f2}
+.lst.done .no{background:#e9e9e6;color:#111}.lst.done .no small{color:#d63b3b}
+.lst.done .stamp{position:absolute;right:10px;top:8px;font-family:var(--xb);font-weight:800;font-size:10.5px;color:#d63b3b;border:1.5px solid #d63b3b;border-radius:4px;padding:0 4px;transform:rotate(-6deg);opacity:.85}
+.lst.done .t{padding-right:56px}
+.sub-h{margin:12px 0 7px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.sub-h::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* 업무 일지 */
+.log{list-style:none;margin:0;padding:0;max-height:420px;overflow:auto;display:grid;gap:0;font-size:13px}
+.log li{display:grid;grid-template-columns:42px 1fr;gap:8px;padding:7px 4px;border-bottom:1px solid var(--line);word-break:keep-all;line-height:1.45}
+.log time{color:var(--sub);font-size:11.5px;padding-top:2px}
+.log .who{font-family:var(--xb);font-weight:800;font-size:12.5px;margin-right:5px;color:var(--y)}
+.log li.err{color:var(--red)}.log li.err .who{color:var(--red)}
+.log li.rep{background:var(--y2);border-radius:8px}
+.log li.new{animation:flashrow 1.4s}
+@keyframes flashrow{from{background:rgba(255,212,59,.35)}}
+.roster{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:12.5px}
+.roster li{display:grid;gap:2px;line-height:1.45;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.roster b small{font-family:var(--body);font-weight:600;font-size:11.5px;color:var(--sub);margin-left:3px}
+.roster b{font-family:var(--xb);font-weight:800;font-size:13px;white-space:nowrap}
+.roster span{color:var(--sub)}
+.roster .svl{font-style:normal;font-size:11.5px;color:var(--ink);opacity:.85}
+.roster .svl u{text-decoration:none;color:var(--y);font-weight:700;margin-right:3px}
+.roster .rm{margin-top:2px;border:0;font-size:11.5px;color:var(--y);font-weight:700}
+
+/* 목표 · 통계 */
+.goal .now{display:flex;align-items:baseline;gap:6px;font-family:var(--xb);font-weight:800}
+.goal .now b{font-size:38px;line-height:1;color:var(--ink)}
+.goal .now span{font-size:18px;color:var(--sub)}
+.goal .now em{margin-left:auto;font-style:normal;font-size:18px;color:var(--y)}
+.goal .bar{height:10px;margin-top:11px}
+.goal .left{margin-top:9px;font-size:13.5px;line-height:1.55}
+.goal .left b{color:var(--y)}
+.eta{margin-top:8px;font-size:13px;padding:8px 11px;border-radius:10px;background:var(--card2);border:1px solid var(--line);line-height:1.5}
+.eta b{color:var(--y);font-family:var(--xb);font-weight:800}
+.ladder{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.ladder span{font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--sub);border:1px solid var(--line)}
+.ladder span.ok{color:var(--green);border-color:rgba(76,211,138,.35)}
+.ladder span.cur{color:#111;background:var(--y);border-color:var(--y);font-weight:700}
+.since{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+.since>div{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 11px;min-width:0}
+.since small{display:block;font-size:11.5px;color:var(--sub)}
+.since b{display:block;font-family:var(--xb);font-weight:800;font-size:20px;margin-top:3px;white-space:nowrap}
+.since b em{font-style:normal;font-size:12px;color:var(--y);margin-left:6px;padding:1px 7px;border-radius:999px;background:var(--y2);vertical-align:3px}
+.since b u{text-decoration:none;font-size:13px;color:var(--sub);font-family:var(--body);font-weight:600;margin-left:2px}
+.since i{display:block;font-style:normal;font-size:11.5px;color:var(--sub);margin-top:2px;white-space:nowrap}
+.since i.up{color:var(--green)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.stats div{background:var(--card2);border-radius:12px;padding:9px 10px;min-width:0}
+.stats small{display:block;font-size:11.5px;color:var(--sub)}
+.stats b{display:block;font-family:var(--xb);font-weight:800;font-size:18px;margin-top:2px;white-space:nowrap}
+.stats i{display:block;font-style:normal;font-size:11px;color:var(--green);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats i.dn{color:var(--red)}.stats i.eq{color:var(--sub)}
+.top{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px;font-size:13px}
+.top li{display:grid;grid-template-columns:18px 1fr auto;gap:7px;align-items:center}
+.top li>span:first-child{font-family:var(--xb);font-weight:800;color:var(--y)}
+.top a{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none}
+.top a:hover{text-decoration:underline}
+.top em{font-style:normal;font-size:12px;color:var(--sub);white-space:nowrap}
+.top-h{margin-top:12px;font-size:12px;color:var(--sub)}
+.foot .infra b{color:var(--ink)}
+.foot{margin-top:18px;font-size:12px;color:var(--sub);text-align:center;line-height:1.7;word-break:keep-all}
+@media (prefers-reduced-motion:reduce){*{animation-duration:0s!important;animation-iteration-count:1!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2" fill="none" stroke="#ffd43b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9.5h12V10" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><rect x="10.2" y="13.5" width="3.6" height="6" rx=".6" fill="#ffd43b"/></svg></div>
+      <div><h1>부지런 <em>AI</em> 일터</h1><small>부지런 공인중개사무소 · 부동산 쇼츠 제작 본부</small></div>
+    </div>
+    <span class="pill idle" id="status"><span class="dot"></span><span id="statusText">연결 중…</span></span>
+    <span class="pill" id="goalPill" style="display:none" title="구독자 목표">🎯 <span id="goalPillText"></span></span>
+    <span class="pill" id="clock">--:--</span>
+    <button class="btn" id="replayBtn" title="마지막 근무를 빨리 감기로 다시 봅니다">⏪ <span class="lg">지난 근무 </span>다시보기</button>
+    <button class="btn inst" id="installBtn" title="홈 화면에 앱으로 설치">📲 앱 설치</button>
+    <a class="btn pri" href="https://www.youtube.com/@buzirun" target="_blank" rel="noopener">▶ 채널 보기</a>
+  </header>
+  <div class="banner" id="banner"></div>
+  <div class="tip" id="installTip" role="dialog" aria-live="polite"></div>
+
+  <div class="main">
+    <div class="viewport" id="viewport">
+      <div class="sizer" id="sizer"><div id="scene"></div></div>
+    </div>
+
+    <aside class="side">
+      <div class="card goal">
+        <h2>🎯 구독자 목표 <span class="cnt" id="goalNo"></span></h2>
+        <div id="goalBody" class="empty">불러오는 중…</div>
+      </div>
+      <div class="card">
+        <h2>📊 채널 통계 <span class="cnt" id="statsAt"></span></h2>
+        <div id="statsBody" class="empty">불러오는 중…</div>
+      </div>
+      <div class="card proj">
+        <h2>📂 지금 진행 중인 건</h2>
+        <div id="projBody" class="empty">불러오는 중…</div>
+      </div>
+      <div class="card">
+        <h2>🏠 매물 게시판 <span class="cnt" id="total"></span></h2>
+        <ul class="listings" id="sched"></ul>
+      </div>
+      <div class="card wide">
+        <h2>📒 실시간 업무 일지 <span class="cnt" id="updated"></span></h2>
+        <ul class="log" id="log"></ul>
+      </div>
+      <div class="card wide">
+        <h2>🪪 직원 명부 <span class="cnt">실제 프로그램 = 직원 1명</span></h2>
+        <ul class="roster" id="roster"></ul>
+      </div>
+    </aside>
+  </div>
+  <div class="foot">직원 한 명 한 명이 실제로 돌아가는 프로그램이에요. GitHub Actions가 영상을 만드는 동안 단계가 끝날 때마다 업무 보고가 올라오고, 직원들이 그 보고를 그대로 연기합니다.<br>
+    <span class="infra">🔧 사무실 설비 · <b>GitHub Gist</b> 일터 실시간 기록 저장 · <b>Vercel</b> 이 일터 페이지 호스팅</span><br>
+    정규 출근 22:23 (예비 02:23 · 05:23 · 10:23, GitHub 사정으로 늦을 수 있어요) · 공개 07:00 / 12:00 / 18:00 / 21:00</div>
+</div>
+
+<script>
+/* ===================== 설정 ===================== */
+const GIST_ID = "";   // 실시간 현황 Gist (office.py가 office.json에 기록) — 고냥이 Gist 를 만들면 여기에 (비어 있으면 예시 화면)
+const POLL_MS = 90000;         // GitHub 비로그인 조회는 IP당 시간당 60회 → 90초 간격, 화면 볼 때만
+const params = new URLSearchParams(location.search);
+const DEMO = params.has("demo") || !GIST_ID;
+const MOBILE = matchMedia("(max-width: 820px)").matches;   // 폰 · 세로 태블릿: 세로 평면도
+const GOAL1 = 500;
+
+/* ===================== 평면도 ===================== */
+const WALL = 64;
+const ZINFO = {
+  ops:     { name: "사무장실", sub: "총괄", floor: "pWood2", wall: "#efece6", door: .5, top: true },
+  plan:    { name: "기획실", sub: "주제 회의", floor: "pTile", wall: "#eceef0", door: .5, top: true },
+  script:  { name: "카피 데스크", sub: "대본", floor: "pWood", wall: "#f3efe7", door: .5, top: true },
+  review:  { name: "법무·검수팀", sub: "검수", floor: "pTile2", wall: "#ebe9e3", door: .5, top: true },
+  voice:   { name: "녹음 부스", sub: "TTS", floor: "pAcoustic", wall: "#2a2a2f", door: .5, top: true, dark: true },
+  idea:    { name: "상담 창구", sub: "아이디어 접수", floor: "pMarble", wall: "#f1efea", door: .88 },
+  publish: { name: "접수 창구", sub: "예약 업로드", floor: "pMarble", wall: "#f1efea", door: .12 },
+  footage: { name: "현장 답사팀", sub: "배경 영상", floor: "pConc", wall: "#e5e7e8", door: .88 },
+  edit:    { name: "디자인·편집실", sub: "편집·자막", floor: "pDark", wall: "#26262b", door: .9, dark: true },
+  pantry:  { name: "탕비실", sub: "휴게", floor: "pCheck", wall: "#f2eee8", door: .5 },
+};
+let SW, SH, SIGN, STORE, CORRS, HALL = null;
+const ROOMS = {};
+const TOP_H = 270, BOT_H = 310, CORR_H = 110;
+function row(ids, ws, x0, y, h) { let x = x0; ids.forEach((id, i) => { ROOMS[id] = { id, ...ZINFO[id], x, y, w: ws[i], h }; x += ws[i]; }); }
+if (!MOBILE) {
+  SW = 1400;
+  SIGN = { x: 10, y: 10, w: 1380, h: 64 };
+  const ty = 84, cy = ty + TOP_H, by = cy + CORR_H;
+  row(["ops", "plan", "script", "review", "voice"], [280, 290, 240, 260, 310], 10, ty, TOP_H);
+  row(["idea", "publish", "footage", "edit", "pantry"], [300, 280, 260, 330, 210], 10, by, BOT_H);
+  const C1 = { id: "corridor", x: 10, y: cy, w: 1380, h: CORR_H, cy: cy + 82 };
+  CORRS = [C1];
+  Object.values(ROOMS).forEach(z => z.corr = C1);
+  STORE = { x: 10, y: by + BOT_H, w: 1380, h: 90 };
+  SH = STORE.y + STORE.h + 10;
+} else {
+  SW = 780;
+  SIGN = { x: 10, y: 10, w: 760, h: 112 };
+  const t1 = 132, c1 = t1 + TOP_H, b1 = c1 + CORR_H, t2 = b1 + BOT_H, c2 = t2 + TOP_H, b2 = c2 + CORR_H;
+  row(["ops", "plan", "script"], [260, 260, 240], 10, t1, TOP_H);
+  row(["idea", "publish"], [350, 350], 10, b1, BOT_H);
+  row(["review", "voice"], [350, 350], 10, t2, TOP_H);
+  row(["footage", "edit", "pantry"], [250, 300, 210], 10, b2, BOT_H);
+  const C1 = { id: "corridor", x: 10, y: c1, w: 760, h: CORR_H, cy: c1 + 82 };
+  const C2 = { id: "corridor2", x: 10, y: c2, w: 760, h: CORR_H, cy: c2 + 82 };
+  CORRS = [C1, C2];
+  HALL = { id: "hall", x: 710, y: b1, w: 60, h: c2 - b1, cx: 740 };
+  for (const id of ["ops", "plan", "script", "idea", "publish"]) ROOMS[id].corr = C1;
+  for (const id of ["review", "voice", "footage", "edit", "pantry"]) ROOMS[id].corr = C2;
+  STORE = { x: 10, y: b2 + BOT_H, w: 760, h: 100 };
+  SH = STORE.y + STORE.h + 10;
+}
+const ZONES = Object.values(ROOMS);
+ZONES.forEach(z => { z.doorX = Math.round(z.x + z.w * z.door); });
+const isCorr = id => CORRS.some(c => c.id === id);
+const zoneOf = id => CORRS.find(c => c.id === id) || ROOMS[id];
+const innerY = z => z.top ? z.y + 252 : z.y + 205;
+
+/* ===================== 직원 = 실제 프로그램 ===================== */
+// hair: short · side · bangs · bob · long · pony · bun · curly · buzz / outfit: suit · blouse · cardigan · guard · vest · hoodie · shirt
+const PEOPLE = [
+  { id: "ceo", name: "김도영", role: "대표", zone: "ops", fx: .5, dy: 140, big: true, human: true,
+    skin: "#f3cfb3", hc: "#1f1a17", hair: "side", outfit: "suit", c: "#1d1d20", tie: "#ffd43b",
+    does: "완성 보고를 받고 직원들을 칭찬해 주는 진짜 사람 (채널 주인)" },
+  { id: "pd", svc: "GitHub Actions", brief: "자동화 총괄", svcDesc: "매일 정해진 시간에 자동화를 돌리는 클라우드 서버", name: "김 사무장", role: "총괄 PD", tool: "autopilot.py", zone: "ops", fx: .2, dy: 198, floor: true,
+    skin: "#efc6a4", hc: "#2b2420", hair: "short", outfit: "suit", c: "#2e3a52", tie: "#c9a227", acc: "glasses",
+    does: "오늘 채울 회차를 정하고, 단계마다 서류를 다음 담당자에게 넘김" },
+  { id: "actions", svc: "GitHub Actions", brief: "매일 정시 출근", svcDesc: "매일 정해진 시간에 자동화를 돌리는 클라우드 서버", name: "박 경비", role: "경비", tool: "GitHub Actions", zone: "ops", fx: .82, dy: 198, floor: true,
+    skin: "#e8b896", hc: "#4a4a4a", hair: "buzz", outfit: "guard", c: "#2b3445", acc: "guardcap",
+    does: "정해진 시간에 사무실 문을 열고 편집 장비 · 유튜브 출입증을 준비" },
+  { id: "discord", svc: "Discord", brief: "아이디어 · 알림", svcDesc: "대표님 아이디어 접수 · 업로드/오류 알림", name: "한 실장", role: "상담 실장", tool: "Discord", zone: "idea", fx: .42, dy: 165, counter: true,
+    skin: "#f6d5bd", hc: "#2a1f1b", hair: "bob", outfit: "blouse", c: "#f4f1ea", acc: "headset",
+    does: "대표님이 디스코드로 남긴 아이디어를 접수해 기획실로 전달" },
+  { id: "gemini", svc: "Google Gemini", brief: "주제 · 카피 AI", svcDesc: "주제 회의 · 대본(카피) 작성 AI", name: "이 팀장", role: "기획 팀장", tool: "Gemini", zone: "plan", fx: .2, dy: 150,
+    skin: "#f3cfb3", hc: "#3a2a22", hair: "side", outfit: "cardigan", c: "#56627a",
+    does: "지난 영상과 겹치지 않는 주제를 고르고 기획 회의를 이끎" },
+  { id: "copy", svc: "Google Gemini", brief: "대본(카피) 작성", svcDesc: "대본(카피) 작성 AI — 제목 · 문장 · 장면 검색어", name: "오 카피라이터", role: "대본", tool: "Gemini", zone: "script", fx: .5, dy: 172,
+    skin: "#f6d5bd", hc: "#2a1f1b", hair: "bangs", outfit: "shirt", c: "#e9e4d8", acc: "glasses",
+    does: "카피 데스크 상주 — 이 팀장이 정한 주제로 대본 · 제목을 씀" },
+  { id: "reviewer", svc: "Google Gemini", brief: "법 · 과장 검수", svcDesc: "대본의 법·제도 오류 · 과장 표현 검수", name: "정 검수관", role: "법무 검수관", tool: "Gemini 검수", zone: "review", fx: .4, dy: 172,
+    skin: "#f1ccb0", hc: "#1d1816", hair: "bun", outfit: "suit", c: "#3d3f46", tie: "#fff", acc: "glasses", blouse: true,
+    does: "법·제도 오류와 '무조건 · 100%' 같은 과장 표현을 잡아 고침" },
+  { id: "kore", svc: "Gemini TTS", brief: "대본 낭독", svcDesc: "대본을 사람 같은 목소리로 낭독", name: "코레", role: "아나운서", tool: "Gemini TTS", vkey: "Kore", zone: "voice", sofa: 0,
+    skin: "#f6d5bd", hc: "#1c1716", hair: "long", outfit: "blouse", c: "#e9edf5", acc: "phones",
+    does: "낭독 (30%) — 정갈하고 또박또박한 아나운서 목소리" },
+  { id: "aoede", svc: "Gemini TTS", brief: "대본 낭독", svcDesc: "대본을 사람 같은 목소리로 낭독", name: "아오이데", role: "아나운서", tool: "Gemini TTS", vkey: "Aoede", zone: "voice", sofa: 1,
+    skin: "#f3cfb3", hc: "#5a3a28", hair: "curly", outfit: "cardigan", c: "#c98b6b", acc: "phones",
+    does: "낭독 (30%) — 따뜻하고 포근한 목소리" },
+  { id: "leda", svc: "Gemini TTS", brief: "대본 낭독", svcDesc: "대본을 사람 같은 목소리로 낭독", name: "레다", role: "아나운서", tool: "Gemini TTS", vkey: "Leda", zone: "voice", sofa: 2,
+    skin: "#f8dcc6", hc: "#2e2220", hair: "pony", outfit: "shirt", c: "#ffd43b", acc: "phones",
+    does: "낭독 (20%) — 밝고 상냥한 젊은 목소리" },
+  { id: "puck", svc: "Gemini TTS", brief: "대본 낭독", svcDesc: "대본을 사람 같은 목소리로 낭독", name: "퍽", role: "아나운서", tool: "Gemini TTS", vkey: "Puck", zone: "voice", sofa: 3,
+    skin: "#e9bd9b", hc: "#231c19", hair: "short", outfit: "hoodie", c: "#3c6e8f", acc: "phones",
+    does: "낭독 (20%) — 경쾌하고 친근한 남성 목소리" },
+  { id: "pixabay", svc: "Pixabay", brief: "무료 배경 영상", svcDesc: "무료 배경 영상 검색 (영어·한국어로 찾고 Gemini가 장면에 맞는 걸 고름)", name: "최 요원", role: "현장 답사 요원", tool: "Pixabay", zone: "footage", fx: .36, dy: 196,
+    skin: "#e8b896", hc: "#2a201b", hair: "short", outfit: "vest", c: "#5d6b78", acc: "hardhat",
+    does: "문장마다 어울리는 실사 배경 영상을 찾아옴" },
+  { id: "ffmpeg", svc: "FFmpeg", brief: "잇기 · 자막 · 렌더", svcDesc: "장면 이어 붙이기 · 자막 입히기 · 최종 렌더링", name: "윤 디자이너", role: "편집", tool: "FFmpeg", zone: "edit", fx: .27, dy: 196,
+    skin: "#f3cfb3", hc: "#151313", hair: "bangs", outfit: "hoodie", c: "#2f2f35", acc: "glasses",
+    does: "장면 잇기 · 자막 입히기 · 최종 렌더링" },
+  { id: "whisper", svc: "Whisper", brief: "단어 타이밍 → 자막", svcDesc: "(OpenAI, faster-whisper) 말소리에서 단어 타이밍을 뽑아 자막을 맞춤", name: "서 담당", role: "자막 싱크", tool: "Whisper", zone: "edit", fx: .66, dy: 196,
+    skin: "#f6d5bd", hc: "#3b2a22", hair: "pony", outfit: "shirt", c: "#8aa1b8", acc: "phones",
+    does: "녹음을 듣고 단어마다 자막 타이밍을 맞춤" },
+  { id: "youtube", svc: "YouTube Data API", brief: "예약 업로드 · 통계", svcDesc: "유튜브 예약 업로드 · 채널 통계", name: "강 주임", role: "접수 담당", tool: "YouTube API", zone: "publish", fx: .55, dy: 165, counter: true,
+    skin: "#efc6a4", hc: "#221b18", hair: "side", outfit: "vestsuit", c: "#f4f1ea", vc: "#3a3a40", tie: "#ffd43b",
+    does: "유튜브에 올리고 공개 시간을 예약 — 등기 접수처럼 꼼꼼하게" },
+];
+const P = Object.fromEntries(PEOPLE.map(p => [p.id, p]));
+// 자리 좌표 (방 기준 → 장면 좌표)
+for (const m of PEOPLE) {
+  const z = ROOMS[m.zone];
+  if (m.sofa != null) { const sp = Math.min(58, (z.w - 130) / 4); m.x = Math.round(z.x + 34 + m.sofa * sp); m.y = z.y + 215; }
+  else { m.x = Math.round(z.x + z.w * m.fx); m.y = z.y + m.dy; }
+}
+const STAGES = [
+  { k: "setup", icon: "🔑", label: "출근", zone: "ops", main: "actions" },
+  { k: "ops", icon: "📋", label: "착수", zone: "ops", main: "pd" },
+  { k: "idea", icon: "💬", label: "상담", zone: "idea", main: "discord" },
+  { k: "plan", icon: "💡", label: "기획", zone: "plan", main: "gemini" },
+  { k: "script", icon: "✍️", label: "카피", zone: "script", main: "copy" },
+  { k: "review", icon: "⚖️", label: "검수", zone: "review", main: "reviewer" },
+  { k: "voice", icon: "🎙", label: "녹음", zone: "voice", main: "pd" },
+  { k: "footage", icon: "📷", label: "답사", zone: "footage", main: "pixabay" },
+  { k: "edit", icon: "🎬", label: "편집", zone: "edit", main: "ffmpeg" },
+  { k: "publish", icon: "📮", label: "업로드", zone: "publish", main: "youtube" }];
+const STAGE = Object.fromEntries(STAGES.map(s => [s.k, s]));
+const DEPT_DEFAULT = { ops: "pd", idea: "discord", plan: "gemini", script: "copy", review: "reviewer", voice: "pd", footage: "pixabay", edit: "ffmpeg", publish: "youtube" };
+const VOICE_BY_KEY = Object.fromEntries(PEOPLE.filter(p => p.vkey).map(p => [p.vkey, p]));
+const LABELS = { subscription: "청약·전월세", contract: "계약·매매 상식", tax: "세금·정책", commercial: "건물·상가",
+  land: "토지", auction: "경매·공매", landlord: "건물주의 세계", trivia: "부동산 잡학" };
+const vz = ROOMS.voice;
+const MIC = { x: vz.x + vz.w - 50, y: vz.y + 206, zone: "voice" };
+const pantrySpots = () => { const z = ROOMS.pantry;
+  return [[.25, 235], [.5, 280], [.76, 235]].map(([f, dy]) => ({ x: z.x + z.w * f, y: z.y + dy, zone: "pantry" })); };
+
+const SMALLTALK = {
+  actions: ["출입 기록 이상 없습니다!", "다음 출근은 22:23이에요", "오늘도 문단속 철저히 🔑"],
+  pd: ["다음 회차 비어 있나 확인 중…", "서류 정리는 사무장의 기본!", "다들 커피 한잔씩 했죠? ☕"],
+  discord: ["대표님 아이디어 언제든 환영이에요!", "상담 창구 열려 있습니다 😊", "디스코드 접수함 확인 중…"],
+  copy: ["첫 문장이 제일 어려워…", "훅은 3초 안에!", "쉽고 짧게 쓰는 게 제일 어려워요"],
+  gemini: ["전세 사기 예방, 한 번 더 다뤄 볼까?", "첫 문장이 제일 어려워…", "요즘 검색어 정리 중 📚"],
+  reviewer: ["'무조건'은 쓰면 안 돼요", "숫자는 꼭 공식 자료로 확인!", "법조문 다시 읽는 중 ⚖️"],
+  kore: ["발음 연습: 등기부등본, 등기부등본", "또박또박이 생명이죠"],
+  aoede: ["포근하게 읽는 게 제 특기예요", "목 풀고 대기 중 ☕"],
+  leda: ["밝게 읽으면 귀에 쏙쏙!", "오늘도 상냥하게 😊"],
+  puck: ["경쾌하게 한 번 가 볼까요?", "청약 가점… 발음 연습!"],
+  whisper: ["싱크 0.01초까지 맞출게요", "귀 쫑긋 👂"],
+  ffmpeg: ["자막은 깔끔한 흰 글씨가 최고", "렌더링 기다릴 땐 기지개 쭉~"],
+  pixabay: ["아파트 단지 영상 좋은 거 찾았다", "오늘도 현장 답사 출동 📷"],
+  youtube: ["예약 시간 다시 확인!", "접수 번호 순서대로 처리합니다"],
+  ceo: ["오늘도 다들 고마워요", "부지런한 사람이 집을 산다!", "구독자 500명까지 가 봅시다 💪"],
+};
+
+/* ===================== 캐릭터 SVG (사람 일러스트) ===================== */
+const mirror = s => `${s}<g transform="matrix(-1 0 0 1 100 0)">${s}</g>`;
+const HAIR_BACK = {
+  long: c => `<path d="M19 50 C15 21 34 11 50 11 C66 11 85 21 81 50 L83 92 Q66 99 50 96 Q34 99 17 92Z" fill="${c}"/>`,
+  bob: c => `<path d="M18 50 C15 21 34 11 50 11 C66 11 85 21 82 50 L83 72 Q76 79 66 75 L34 75 Q24 79 17 72Z" fill="${c}"/>`,
+  pony: c => `<path d="M70 26 Q93 30 90 62 Q88 76 80 82 Q84 64 76 46Z" fill="${c}"/><circle cx="73" cy="27" r="4.5" fill="#ffd43b"/>`,
+  bun: c => `<circle cx="50" cy="15" r="11" fill="${c}"/>`,
+  curly: c => `<g fill="${c}">${[[20, 62], [80, 62], [18, 76], [82, 76], [24, 88], [76, 88]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9"/>`).join("")}<path d="M18 50 C15 21 34 11 50 11 C66 11 85 21 82 50 L84 80 L16 80Z"/></g>`,
+};
+const HAIR_FRONT = {
+  short: c => `<path d="M21 50 C18 24 34 13 50 13 C67 13 82 24 79 50 C76 40 69 33 60 31 C53 36 41 36 33 31 C27 35 23 42 21 50Z" fill="${c}"/>`,
+  side: c => `<path d="M21 50 C17 23 35 12 52 13 C70 14 84 26 79 50 C77 41 73 35 67 32 C57 30 44 32 31 39 C26 42 23 46 21 50Z" fill="${c}"/><path d="M40 21 Q52 18 64 24" stroke="rgba(255,255,255,.18)" stroke-width="2" fill="none"/>`,
+  bangs: c => `<path d="M21 53 C17 22 34 12 50 12 C66 12 83 22 79 53 C76 43 73 38 70 36 C61 41 45 41 37 35 C30 37 24 45 21 53Z" fill="${c}"/>`,
+  bob: c => `<path d="M21 54 C17 22 34 12 50 12 C66 12 83 22 79 54 C77 42 72 36 66 34 C58 39 46 38 40 33 C31 36 24 44 21 54Z" fill="${c}"/>`,
+  long: c => `<path d="M21 56 C17 22 34 12 50 12 C66 12 83 22 79 56 C77 40 70 33 56 30 C50 35 40 38 31 38 C26 42 22 48 21 56Z" fill="${c}"/>`,
+  pony: c => `<path d="M21 51 C18 23 34 13 50 13 C66 13 82 23 79 51 C76 41 72 35 66 32 C56 33 42 31 34 34 C28 38 23 44 21 51Z" fill="${c}"/>`,
+  bun: c => `<path d="M21 50 C18 23 34 14 50 14 C66 14 82 23 79 50 C76 40 70 33 60 31 C54 33 46 33 40 31 C30 33 24 41 21 50Z" fill="${c}"/>`,
+  curly: c => `<g fill="${c}">${[[28, 30], [38, 21], [50, 18], [62, 21], [72, 30], [24, 42], [76, 42]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9.5"/>`).join("")}</g>`,
+  buzz: c => `<path d="M22 46 C21 25 35 17 50 17 C65 17 79 25 78 46 C74 37 66 33 50 33 C34 33 26 37 22 46Z" fill="${c}"/>`,
+};
+function outfitSvg(m) {
+  const torso = c => `<path d="M27 108 C26 86 36 76 50 76 C64 76 74 86 73 108Z" fill="${c}"/>`;
+  switch (m.outfit) {
+    case "suit": return torso(m.c) + `<path d="M41 77 L50 92 L59 77Z" fill="${m.blouse ? "#f4f1ea" : "#fff"}"/>` +
+      (m.blouse ? `<path d="M44 78 L50 86 L56 78" fill="none" stroke="#d8d4cc" stroke-width="1.4"/>` : `<path d="M50 80 l-3.4 4 3.4 15 3.4 -15Z" fill="${m.tie}"/>`) +
+      mirror(`<path d="M41 77 L48 97 L44 101 L35 85Z" fill="rgba(0,0,0,.18)"/>`) + `<circle cx="50" cy="103" r="1.4" fill="rgba(0,0,0,.35)"/>`;
+    case "vestsuit": return torso(m.c) + `<path d="M50 80 l-3.4 4 3.4 15 3.4 -15Z" fill="${m.tie}"/>` +
+      mirror(`<path d="M37 82 Q40 78 43 79 L49 104 L32 106 Q31 92 37 82Z" fill="${m.vc}"/>`) + `<path d="M41 77 L50 87 L59 77" fill="none" stroke="#d8d4cc" stroke-width="1.4"/>`;
+    case "blouse": return torso(m.c) + mirror(`<path d="M40 77 Q42 87 50 83 L50 79Z" fill="#fff" stroke="#d6d2ca" stroke-width="1"/>`) +
+      `<circle cx="50" cy="85" r="2" fill="#ffd43b"/>`;
+    case "cardigan": return torso("#f6f4ef") + mirror(`<path d="M27 108 C26 88 34 78 43 77 L48 108Z" fill="${m.c}"/>`) +
+      `<circle cx="46" cy="92" r="1.3" fill="rgba(0,0,0,.3)"/><circle cx="46" cy="101" r="1.3" fill="rgba(0,0,0,.3)"/>`;
+    case "guard": return torso(m.c) + `<path d="M43 77 L50 84 L57 77" fill="none" stroke="#e8e8e8" stroke-width="2"/>` +
+      `<path d="M58 88 l4 -2 4 2 v4 q-4 4 -8 0Z" fill="#ffd43b"/>` + mirror(`<rect x="29" y="82" width="9" height="3" rx="1.5" fill="#ffd43b" transform="rotate(-25 33 83)"/>`);
+    case "vest": return torso(m.c) + mirror(`<path d="M36 81 Q40 77 44 78 L48 108 L28 108 Q27 90 36 81Z" fill="#ff8a1f"/>`) +
+      `<rect x="29" y="96" width="42" height="3.5" fill="#e9eef2" opacity=".9"/><rect x="29" y="102" width="42" height="2.5" fill="#e9eef2" opacity=".7"/>`;
+    case "hoodie": return torso(m.c) + `<path d="M35 81 Q50 95 65 81 Q60 78 50 84 Q40 78 35 81Z" fill="rgba(0,0,0,.22)"/>` +
+      `<path d="M46 86 v9 M54 86 v9" stroke="#eee" stroke-width="1.4" stroke-linecap="round"/>`;
+    default: return torso(m.c) + `<path d="M41 77 L50 85 L59 77" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1.6"/>`;
+  }
+}
+function headwear(acc) {
+  return {
+    glasses: `<g fill="rgba(255,255,255,.18)" stroke="#1d1d1f" stroke-width="1.7"><rect x="32" y="45" width="15" height="11" rx="4"/><rect x="53" y="45" width="15" height="11" rx="4"/></g><path d="M47 50h6" stroke="#1d1d1f" stroke-width="1.7"/>`,
+    phones: `<path d="M20 52 C19 16 81 16 80 52" fill="none" stroke="#1d1d1f" stroke-width="4" stroke-linecap="round"/><rect x="14" y="45" width="10" height="17" rx="4" fill="#1d1d1f"/><rect x="76" y="45" width="10" height="17" rx="4" fill="#1d1d1f"/><rect x="78" y="49" width="6" height="9" rx="2" fill="#ffd43b"/>`,
+    headset: `<path d="M21 50 C20 18 80 18 79 50" fill="none" stroke="#2b2b2f" stroke-width="2.6" stroke-linecap="round"/><rect x="16" y="45" width="8" height="13" rx="3.5" fill="#2b2b2f"/><path d="M20 57 Q22 69 37 68" fill="none" stroke="#2b2b2f" stroke-width="2"/><circle cx="38" cy="68" r="2.4" fill="#2b2b2f"/>`,
+    guardcap: `<path d="M22 37 C23 13 77 13 78 37Z" fill="#232b3a"/><path d="M20 36 Q50 44 80 36 L81 40 Q50 49 19 40Z" fill="#141a24"/><path d="M45 21 l5 -3 5 3 v5 q-5 4 -10 0Z" fill="#ffd43b"/>`,
+    hardhat: `<path d="M19 39 C19 11 81 11 81 39Z" fill="#ffd43b"/><rect x="13" y="35" width="74" height="7" rx="3.5" fill="#f2c21a"/><path d="M50 13 V36" stroke="#e6b40f" stroke-width="5"/><rect x="28" y="22" width="9" height="4" rx="2" fill="#fff" opacity=".55"/>`,
+  }[acc] || "";
+}
+function personSvg(m, opts = {}) {
+  const skin = m.skin, hc = m.hc;
+  const pants = m.outfit === "vest" ? "#3f4a55" : "#2c2c33";
+  const legs = opts.walk ? `
+    <g class="leg l"><rect x="38" y="102" width="10" height="16" rx="4" fill="${pants}"/><ellipse cx="42" cy="119" rx="7" ry="3.5" fill="#141416"/></g>
+    <g class="leg r"><rect x="52" y="102" width="10" height="16" rx="4" fill="${pants}"/><ellipse cx="58" cy="119" rx="7" ry="3.5" fill="#141416"/></g>` : "";
+  const carry = opts.carry ? `<g transform="translate(57 84) rotate(-8)"><rect width="22" height="17" rx="2" fill="#f3e6c8" stroke="#b9a274" stroke-width="1.2"/><rect x="2" y="-3" width="9" height="4" rx="1" fill="#f3e6c8" stroke="#b9a274" stroke-width="1.2"/><text x="11" y="12" font-size="8" text-anchor="middle">${opts.carry}</text></g>` : "";
+  const cup = opts.cup ? `<g transform="translate(62 88)"><path d="M0 0 h14 l-2 10 h-10Z" fill="#fff" stroke="#999" stroke-width="1"/><rect x="0" y="3" width="14" height="3" fill="#ffd43b"/></g>` : "";
+  const hand = (cx, side) => `<ellipse class="hand ${side}" cx="${cx}" cy="98" rx="6.5" ry="6" fill="${skin}"/>`;
+  return `<svg class="chr" viewBox="0 0 100 122" aria-hidden="true">
+    ${opts.walk ? `<ellipse cx="50" cy="120" rx="22" ry="3.5" fill="rgba(0,0,0,.22)"/>` : ""}
+    ${legs}
+    <g class="bob">
+      ${(HAIR_BACK[m.hair] || (() => ""))(hc)}
+      ${outfitSvg(m)}
+      ${hand(28, "l")}${hand(72, "r")}
+      <rect x="45" y="68" width="10" height="10" rx="4" fill="${skin}"/>
+      <circle cx="50" cy="48" r="29" fill="${skin}"/>
+      <ellipse cx="21.5" cy="52" rx="4" ry="5.5" fill="${skin}"/><ellipse cx="78.5" cy="52" rx="4" ry="5.5" fill="${skin}"/>
+      ${(HAIR_FRONT[m.hair] || HAIR_FRONT.short)(hc)}
+      <g class="eyes"><ellipse cx="40" cy="52" rx="3.3" ry="4.3" fill="#231d1d"/><ellipse cx="60" cy="52" rx="3.3" ry="4.3" fill="#231d1d"/>
+        <circle cx="41.2" cy="50.4" r="1.25" fill="#fff"/><circle cx="61.2" cy="50.4" r="1.25" fill="#fff"/></g>
+      <path d="M35 45.5 Q40 43.5 44 45 M56 45 Q60 43.5 65 45.5" stroke="${hc}" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/>
+      <ellipse cx="33" cy="60" rx="4.6" ry="2.8" fill="#ff8f8f" opacity=".35"/><ellipse cx="67" cy="60" rx="4.6" ry="2.8" fill="#ff8f8f" opacity=".35"/>
+      <path class="mouth-s" d="M45.5 61.5 Q50 66 54.5 61.5" fill="none" stroke="#7a3b3b" stroke-width="2" stroke-linecap="round"/>
+      <ellipse class="mouth-o" cx="50" cy="63" rx="3.6" ry="3" fill="#7a3b3b"/>
+      ${headwear(m.acc)}
+      <path class="sweat" d="M76 34 q4 6 0 9 q-4 -3 0 -9Z" fill="#7cc7ff"/>
+      <text class="zz" x="70" y="22" font-size="13" fill="#888" font-weight="700">z</text>
+      ${carry}${cup}
+    </g>
+  </svg>`;
+}
+
+/* ===================== 평면도 SVG ===================== */
+const R = (x, y, w, h, fill, extra = "") => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" ${extra}/>`;
+const T = (x, y, txt, size, fill, extra = "") => `<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" ${extra}>${txt}</text>`;
+function windowSvg(x, y, w, h) {
+  return `<g>${R(x - 3, y - 3, w + 6, h + 6, "#fbfaf7", 'rx="2"')}
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#gDaySky)" class="day-only"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#gNightSky)" class="night-only"/>
+    <g class="day-only" fill="#c9d6de">${R(x + 4, y + h - 16, 10, 16, "#c3cfd8")}${R(x + 16, y + h - 24, 12, 24, "#b6c4ce")}${R(x + w - 20, y + h - 19, 14, 19, "#c3cfd8")}</g>
+    <g class="night-only">${R(x + 4, y + h - 16, 10, 16, "#2a3150")}${R(x + 16, y + h - 24, 12, 24, "#232a46")}<rect x="${x + 19}" y="${y + h - 19}" width="3" height="3" fill="#ffd43b"/></g>
+    ${R(x + w / 2 - 1.5, y, 3, h, "#fbfaf7")}</g>`;
+}
+function plantSvg(x, y, s = 1) {
+  return `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="17" rx="13" ry="4" fill="rgba(0,0,0,.15)"/>
+    <path d="M-10 0 L10 0 L7 17 L-7 17Z" fill="#e9e6df"/>${R(-11, -3, 22, 5, "#d6d2c8", 'rx="2"')}
+    <g fill="#4f9a62"><ellipse cx="-8" cy="-12" rx="6" ry="13" transform="rotate(-25 -8 -12)"/><ellipse cx="8" cy="-12" rx="6" ry="13" transform="rotate(25 8 -12)"/>
+    <ellipse cx="0" cy="-18" rx="6" ry="15"/></g><ellipse cx="-3" cy="-20" rx="2" ry="8" fill="#76c08a"/></g>`;
+}
+function binders(x, y, w, h, label, cols = ["#1f2a44", "#2f3e5c", "#8a6d3b", "#444b55", "#1f2a44", "#5a4632"]) {
+  const out = [], n = Math.floor((h - 6) / 24);
+  for (let i = 0; i < n; i++) {
+    let cx = x + 4, j = i * 2;
+    while (cx < x + w - 10) { const bw = 6 + (j * 5) % 4;
+      out.push(R(cx, y + 5 + i * 24, bw, 17, cols[j % cols.length], 'rx="1"'), R(cx + 1.5, y + 9 + i * 24, bw - 3, 2, "rgba(255,212,59,.6)")); cx += bw + 1; j++; }
+    out.push(R(x + 2, y + 22 + i * 24, w - 4, 3, "#8c7458"));
+  }
+  return `<g>${R(x, y, w, h, "#a88c6c", 'rx="2"')}${R(x + 2, y + 2, w - 4, h - 4, "#6d5640")}${out.join("")}
+    ${label ? `${R(x + w / 2 - 26, y + h - 13, 52, 11, "#fff", 'rx="2"')}${T(x + w / 2, y + h - 4.5, label, 7.5, "#333", 'text-anchor="middle"')}` : ""}</g>`;
+}
+function rug(x, y, w, h, c) { return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${c}" opacity=".7"/><rect x="${x + 6}" y="${y + 6}" width="${w - 12}" height="${h - 12}" rx="5" fill="none" stroke="#fff" stroke-opacity=".35"/>`; }
+function chairTop(x, y, c = "#3a3a40") { return `<g>${R(x - 11, y - 9, 22, 18, c, 'rx="6"')}${R(x - 9, y - 13, 18, 6, c, 'rx="3" opacity=".8"')}</g>`; }
+function clockSvg(x, y) { return `<g><circle cx="${x}" cy="${y}" r="11" fill="#fff" stroke="#222" stroke-width="2"/><path d="M${x} ${y} V${y - 7} M${x} ${y} L${x + 5} ${y + 2}" stroke="#222" stroke-width="1.6" stroke-linecap="round"/></g>`; }
+function zoneSvg(z) {
+  const s = [], { x, y, w, h } = z, wb = y + WALL;
+  s.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${z.floor})"/>`);
+  s.push(R(x, y, w, WALL, z.wall));
+  s.push(R(x, wb - 5, w, 5, z.dark ? "#1c1c20" : "#d8d3ca"));
+  s.push(`<rect x="${x}" y="${wb}" width="${w}" height="24" fill="url(#gWallShadow)"/>`);
+  switch (z.id) {
+    case "ops": {
+      s.push(`<g transform="translate(${x + 12} ${y + 8})">${R(0, 0, 120, 46, "#1a1a1c", 'rx="3"')}${R(4, 4, 112, 38, "#fbfaf7", 'rx="2"')}
+        ${T(60, 21, "부지런한 사람이", 10.5, "#111", 'text-anchor="middle" class="xb"')}${T(60, 34, "집을 산다", 10.5, "#111", 'text-anchor="middle" class="xb"')}${R(46, 37.5, 28, 2, "#ffd43b")}</g>`);
+      s.push(`<g transform="translate(${x + 142} ${y + 9})">${R(0, 0, 56, 44, "#141416", 'rx="4"')}${R(3, 3, 50, 38, "none", 'rx="2" stroke="#ffd43b" stroke-opacity=".5"')}${T(28, 15, "계약 완료", 8, "#bdbdbd", 'text-anchor="middle"')}</g>`);
+      s.push(`<g transform="translate(${x + w - 50} ${y + 8})">${R(0, 0, 38, 48, "#d9dcdf", 'rx="4"')}<circle cx="19" cy="16" r="10" fill="#fff" stroke="#555" stroke-width="1.5"/>
+        <path d="M19 16 V9 M19 16 L24 18" stroke="#111" stroke-width="1.5"/>${R(9, 31, 20, 4, "#555", 'rx="1"')}${T(19, 44, "출근 기록", 6.5, "#444", 'text-anchor="middle"')}</g>`);
+      s.push(rug(x + w / 2 - 78, y + 82, 156, 78, "#b9a888"));
+      s.push(binders(x + 10, y + 70, 40, 74, ""));
+      s.push(`<g transform="translate(${x + w - 52} ${y + 92})">${R(0, 0, 40, 44, "#3a3b40", 'rx="3"')}<circle cx="20" cy="22" r="9" fill="none" stroke="#9a9ca3" stroke-width="2"/><path d="M20 15 V22 L25 22" stroke="#9a9ca3" stroke-width="2"/>${T(20, 41, "금고", 7, "#ccc", 'text-anchor="middle"')}</g>`);
+      break;
+    }
+    case "plan": {
+      s.push(windowSvg(x + 14, y + 10, 52, 40));
+      const bx = x + 80, bw = w - 94;
+      s.push(`<g>${R(bx, y + 6, bw, 52, "#fff", 'rx="3" stroke="#bfbfbf" stroke-width="3"')}${T(bx + 8, y + 19, "이번 주 주제 회의", 9, "#111", 'class="xb"')}
+        ${[["#ffe58a", 8, 25, -3], ["#ffd2c2", 40, 27, 4], ["#cfe8d4", 72, 25, -2], ["#d4e2ff", 104, 28, 3], ["#ffe58a", 136, 26, -4]].filter(n => n[1] + 26 < bw)
+          .map(([c, a, b, r]) => `<rect x="${bx + a}" y="${y + b}" width="24" height="22" fill="${c}" transform="rotate(${r} ${bx + a + 12} ${y + b + 11})"/>`).join("")}</g>`);
+      const cx = x + w * .64;
+      s.push(`<g>${R(cx - 30, y + 150, 60, 100, "rgba(0,0,0,.12)", 'rx="12"')}${R(cx - 32, y + 144, 64, 100, "#cdb592", 'rx="12"')}${R(cx - 27, y + 149, 54, 90, "#dcc6a4", 'rx="9"')}
+        ${R(cx - 18, y + 160, 16, 12, "#fff", 'rx="1"')}${R(cx + 4, y + 196, 16, 12, "#fff", 'rx="1"')}${R(cx - 14, y + 218, 16, 12, "#fff", 'rx="1"')}
+        <circle cx="${cx + 12}" cy="${y + 168}" r="4.5" fill="#fff" stroke="#333" stroke-width="1.6"/></g>`);
+      s.push(plantSvg(x + w - 20, y + 236, .75));
+      break;
+    }
+    case "script": {
+      const bw = Math.min(150, w - 70);
+      s.push(`<g transform="translate(${x + 14} ${y + 6})">${R(0, 0, bw, 52, "#b99467", 'rx="3"')}${R(3, 3, bw - 6, 46, "#caa77a")}
+        ${[["훅은 3초 안에", 6, 7, -3, "#fff"], ["쉽게 · 짧게", 6, 28, 2, "#ffe58a"], ["첫 문장!", bw / 2 + 4, 9, 4, "#ffe58a"], ["숫자는 확인", bw / 2 + 2, 29, -2, "#fff"]]
+          .map(([t, a, b, r, c]) => `<g transform="rotate(${r} ${a + 30} ${b + 8})">${R(a, b, bw / 2 - 12, 16, c)}${T(a + 4, b + 11, t, 7.5, "#222")}</g>`).join("")}</g>`);
+      s.push(clockSvg(x + w - 30, y + 30));
+      s.push(rug(x + w / 2 - 70, y + 140, 140, 100, "#8e9aa8"));
+      s.push(`<g transform="translate(${x + 18} ${y + 200})">${R(0, 0, 22, 26, "#55575e", 'rx="3"')}<circle cx="6" cy="-3" r="5" fill="#f4f4f2"/><circle cx="15" cy="-1" r="4" fill="#e8e8e6"/></g>`);
+      s.push(`<g fill="#f4f4f2"><circle cx="${x + 54}" cy="${y + 238}" r="4"/><circle cx="${x + w - 40}" cy="${y + 160}" r="3.5"/></g>`);
+      break;
+    }
+    case "review": {
+      s.push(windowSvg(x + 14, y + 10, 46, 40));
+      s.push(`<g transform="translate(${x + 72} ${y + 8})">${R(0, 0, 96, 46, "#1a1a1c", 'rx="3"')}${R(4, 4, 88, 38, "#fbfaf7", 'rx="2"')}
+        ${T(48, 16, "검수 기준", 8.5, "#111", 'text-anchor="middle" class="xb"')}${T(48, 28, "① 사실 ② 과장", 7.5, "#444", 'text-anchor="middle"')}${T(48, 38, "③ 오탈자", 7.5, "#444", 'text-anchor="middle"')}</g>`);
+      s.push(binders(x + w - 76, y + 4, 64, 106, "법전·판례", ["#13223f", "#7a1f2b", "#13223f", "#2c3b2a", "#13223f"]));
+      s.push(`<g transform="translate(${x + w - 74} ${y + 160})">${R(0, 0, 58, 40, "#cdb592", 'rx="3"')}${R(6, -6, 22, 16, "#fff", 'rx="1"')}${R(8, -10, 22, 16, "#f6f6f3", 'rx="1"')}
+        <g id="seal"><rect x="36" y="-14" width="10" height="16" rx="3" fill="#7a1f2b"/><ellipse cx="41" cy="3" rx="8" ry="3" fill="#a4282f"/></g>
+        <circle cx="18" cy="26" r="9" fill="none" stroke="#d63b3b" stroke-width="2"/>${T(18, 29, "검수", 6.5, "#d63b3b", 'text-anchor="middle" class="xb"')}</g>`);
+      s.push(plantSvg(x + 20, y + 236, .75));
+      break;
+    }
+    case "voice": {
+      for (let yy = y + 6; yy < wb - 10; yy += 15) for (let xx = x + 8 + (Math.round((yy - y) / 15) % 2) * 7; xx < x + w - 104; xx += 14)
+        s.push(`<path d="M${xx} ${yy} l7 0 l-3.5 10Z" fill="#3c3c43"/>`);
+      s.push(`<g id="onair" transform="translate(${x + 20} ${y + 20})">${R(0, 0, 66, 20, "#1c1c20", 'rx="4"')}${T(33, 14, "ON AIR", 10.5, "#8a8a92", 'text-anchor="middle" class="xb" letter-spacing="1"')}</g>`);
+      const bx = x + w - 96;
+      s.push(`<g>${R(bx, y + 6, 88, 252, "#323238")}${R(bx, y + 6, 88, WALL - 6, "#26262b")}
+        ${R(bx, y + 6, 88, 252, "rgba(200,225,255,.08)", 'stroke="rgba(220,235,255,.45)" stroke-width="3" rx="3"')}
+        ${T(bx + 44, y + 28, "방음 부스", 9.5, "#c8c8d0", 'text-anchor="middle"')}
+        <g transform="translate(${MIC.x - 11} ${MIC.y - 88})">${R(9, 20, 4, 56, "#8c8c96")}${R(0, 74, 22, 4, "#8c8c96", 'rx="2"')}${R(4, 0, 14, 22, "#c9c9d2", 'rx="7"')}
+          <circle cx="11" cy="11" r="13" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="2 2"/></g>
+        <g id="micwait" transform="translate(${MIC.x - 30} ${MIC.y + 6})">${R(0, 0, 60, 18, "#111", 'rx="3"')}<circle cx="9" cy="9" r="3" fill="#ffd43b"/>${T(34, 12.5, "녹음 대기", 8.5, "#fff", 'text-anchor="middle" class="xb"')}</g></g>`);
+      const sp = Math.min(58, (w - 130) / 4), sx = x + 12, sw = 3 * sp + 44;
+      s.push(`<g>${R(sx, y + 180, sw, 20, "#4a4c55", 'rx="8"')}${R(sx, y + 194, sw, 24, "#5b5d66", 'rx="7"')}${R(sx - 7, y + 186, 13, 32, "#4a4c55", 'rx="6"')}${R(sx + sw - 6, y + 186, 13, 32, "#4a4c55", 'rx="6"')}</g>`);
+      s.push(`<g transform="translate(${x + 96} ${y + 116})"><ellipse cx="14" cy="10" rx="15" ry="6" fill="#d6d6dc"/><rect x="8" y="2" width="8" height="8" rx="2" fill="#fff"/><rect x="18" y="3" width="7" height="7" rx="2" fill="#fff"/></g>`);
+      break;
+    }
+    case "idea": {
+      const dl = z.doorX - x - 30;   // 문 왼쪽까지
+      s.push(`<g transform="translate(${x + 14} ${y + 8})">${R(0, 0, 58, 50, "#d9d6cf", 'rx="2"')}
+        ${[["청약", "#ffd43b"], ["전세", "#fff"], ["매매", "#e8e8e8"]].map(([t, c], i) => `${R(4 + i * 18, 6, 15, 38, c, 'rx="1" stroke="#bbb" stroke-width=".8"')}${T(11.5 + i * 18, 28, t[0], 7, "#333", 'text-anchor="middle"')}${T(11.5 + i * 18, 37, t[1], 7, "#333", 'text-anchor="middle"')}`).join("")}</g>`);
+      const sx = x + 82, sw = Math.min(150, dl - 82);
+      s.push(`<g>${R(sx, y + 10, sw, 34, "#111", 'rx="4"')}${T(sx + sw / 2, y + 32, "상담 창구", 14, "#fff", 'text-anchor="middle" class="xb"')}${R(sx + sw / 2 - 14, y + 38, 28, 2, "#ffd43b")}</g>`);
+      if (dl - sx - sw > 46) s.push(`<g transform="translate(${sx + sw + 8} ${y + 12})">${R(0, 0, 38, 30, "#0b0b0c", 'rx="3"')}<text id="ticket" x="19" y="21" font-size="13" text-anchor="middle" fill="#ffd43b" class="xb">017</text></g>`);
+      const cx = P.discord.x;
+      s.push(`<g transform="translate(${cx - 70} ${y + 232})">${R(0, 0, 30, 34, "#d6d2c8", 'rx="2"')}${R(3, 3, 24, 8, "#ffd43b", 'rx="1"')}${R(3, 13, 24, 8, "#fff", 'rx="1"')}${R(3, 23, 24, 8, "#fff", 'rx="1"')}</g>`, plantSvg(cx + 60, y + 250, .8));
+      s.push(plantSvg(x + w - 26, y + 270, .85));
+      break;
+    }
+    case "publish": {
+      const l = z.doorX - x + 34;   // 문 오른쪽부터
+      const mw = Math.min(160, w - l - 14);
+      s.push(`<g transform="translate(${x + l} ${y + 8})">${R(0, 0, mw, 48, "#111", 'rx="4"')}${T(10, 17, "접수 번호", 8.5, "#9a9a9a")}
+        <text id="jsNo" x="${mw - 10}" y="20" font-size="15" text-anchor="end" fill="#ffd43b" class="xb">0000</text>
+        ${R(10, 28, mw - 20, 7, "#2b2b2f", 'rx="3.5"')}<rect id="upbar" x="10" y="28" width="${mw - 20}" height="7" rx="3.5" fill="#ffd43b"/>
+        ${T(10, 44, "유튜브 전송", 7, "#9a9a9a")}</g>`);
+      const cx = P.youtube.x;
+      s.push(`<g>${R(cx - 60, y + 96, 120, 50, "rgba(205,228,240,.35)", 'stroke="rgba(160,190,205,.8)" stroke-width="2" rx="2"')}${R(cx - 16, y + 132, 32, 12, "rgba(0,0,0,.08)", 'rx="5"')}
+        ${R(cx - 22, y + 100, 44, 12, "#111", 'rx="2"')}${T(cx, y + 109, "등기 접수", 7.5, "#fff", 'text-anchor="middle" class="xb"')}</g>`);
+      s.push(`<g transform="translate(${x + w - 62} ${y + 92})">${R(0, 0, 48, 44, "#8b8f96", 'rx="2"')}${R(4, 4, 40, 10, "#d8dadc", 'rx="1"')}${R(4, 17, 40, 10, "#d8dadc", 'rx="1"')}${R(4, 30, 40, 10, "#d8dadc", 'rx="1"')}
+        ${T(24, 54, "접수함", 7.5, "#555", 'text-anchor="middle"')}</g>`);
+      s.push(`<g transform="translate(${cx - 66} ${y + 236})"><path d="M0 26 V4 M60 26 V4" stroke="#9a9a9a" stroke-width="3"/><circle cx="0" cy="3" r="3.5" fill="#bbb"/><circle cx="60" cy="3" r="3.5" fill="#bbb"/><path d="M0 7 Q30 16 60 7" stroke="#111" stroke-width="3" fill="none"/></g>`);
+      s.push(plantSvg(x + 24, y + 270, .85));
+      break;
+    }
+    case "footage": {
+      const mw = Math.min(118, z.doorX - x - 40);
+      s.push(`<g transform="translate(${x + 12} ${y + 6})">${R(0, 0, mw, 52, "#f7f5ef", 'rx="2" stroke="#9a9a9a" stroke-width="2"')}
+        <path d="M4 34 Q30 24 ${mw / 2} 30 T${mw - 4} 22" stroke="#9fc5e8" stroke-width="6" fill="none"/>
+        <path d="M${mw * .3} 2 V50 M2 16 H${mw - 2} M${mw * .72} 2 V50" stroke="#ddd" stroke-width="3"/>
+        ${R(mw * .42, 36, 16, 10, "#cfe5c6")}
+        ${[[.22, 14, "#e5484d"], [.55, 40, "#e5484d"], [.82, 12, "#ffb000"]].map(([f, b, c]) => `<g class="pin"><circle cx="${mw * f}" cy="${b}" r="4" fill="${c}"/><path d="M${mw * f} ${b + 3} v5" stroke="${c}" stroke-width="2"/></g>`).join("")}</g>`);
+      const px = x + mw + 22, pw = z.doorX - 30 - px;
+      if (pw > 40) s.push(`<g>${R(px, y + 8, pw, 48, "#3a3b40", 'rx="2"')}${[0, 1, 2].filter(i => 4 + i * 30 + 26 < pw).map(i => `<g transform="rotate(${[-4, 3, -2][i]} ${px + 17 + i * 30} ${y + 30})">${R(px + 4 + i * 30, y + 14, 26, 32, "#fff")}${R(px + 7 + i * 30, y + 17, 20, 18, ["#9fb6c8", "#c8b79f", "#a8c49f"][i])}${R(px + 11 + i * 30, y + 23, 6, 12, "#6a7d8c")}${R(px + 18 + i * 30, y + 26, 6, 9, "#7d8c6a")}</g>`).join("")}</g>`);
+      const tx = x + w * .78;
+      s.push(`<g transform="translate(${tx} ${y + 150})"><path d="M10 26 L0 74 M10 26 L20 74 M10 26 L10 76" stroke="#444" stroke-width="3" stroke-linecap="round"/>
+        ${R(-6, 4, 32, 22, "#222", 'rx="4"')}<circle cx="10" cy="15" r="7" fill="#3b4b5c" stroke="#ccc" stroke-width="2"/>${R(16, 0, 8, 5, "#222", 'rx="1"')}
+        <circle id="flash" cx="20" cy="2" r="12" fill="#fff8d6"/></g>`);
+      s.push(`<g transform="translate(${x + 14} ${y + 120})">${R(0, 0, 40, 30, "#c9a77a", 'rx="2"')}${R(0, 12, 40, 3, "#a8875c")}${T(20, 26, "장비", 7.5, "#5a4632", 'text-anchor="middle"')}</g>`);
+      break;
+    }
+    case "edit": {
+      const mw = z.doorX - x - 44;
+      s.push(`<g transform="translate(${x + 14} ${y + 6})">${R(0, 0, mw, 54, "#0f0f12", 'rx="4"')}
+        ${R(5, 5, 74, 44, "#2a3a4f")}<path d="M5 49 V32 h10 V22 h12 V30 h10 V16 h14 V34 h10 V26 h18 V49Z" fill="#1a2332"/>
+        ${R(14, 39, 56, 4, "#fff", 'rx="1"')}${R(36, 44, 14, 2, "#ffd43b")}
+        ${R(86, 5, mw - 92, 30, "#1e1e24")}${R(90, 9, (mw - 100) * .8, 5, "#ffd43b", 'opacity=".85"')}${R(90, 17, (mw - 100) * .55, 5, "#8aa1b8")}${R(90, 25, (mw - 100) * .7, 5, "#c9c9d2")}
+        ${R(86, 38, mw - 92, 11, "#1e1e24")}${T(90, 46.5, "자막 싱크", 7, "#9aa")}<rect id="playhead" x="88" y="36" width="2" height="15" fill="#ff5d5d"/></g>`);
+      s.push(rug(x + 30, y + 150, w - 60, 110, "#3b3b44"));
+      s.push(plantSvg(x + w - 22, y + 274, .8));
+      break;
+    }
+    case "pantry": {
+      s.push(`<g>${R(x + 8, y + 30, z.doorX - x - 40, 10, "#9a9a9a")}${R(x + 8, y + 40, z.doorX - x - 40, 40, "#e5e2db")}
+        <g transform="translate(${x + 14} ${y + 4})">${R(0, 0, 30, 34, "#2b2b30", 'rx="4"')}${R(4, 4, 22, 7, "#45454c", 'rx="2"')}<circle cx="22" cy="8" r="1.8" fill="#ffd43b"/>${R(9, 20, 11, 11, "#fff", 'rx="2"')}
+        <path class="steam" d="M12 16 q3 -5 0 -10 M18 16 q3 -5 0 -10" stroke="#fff" stroke-width="1.6" fill="none"/></g></g>`);
+      s.push(`<g transform="translate(${x + w - 58} ${y + 6})">${R(0, 0, 50, 8, "#dfe3e6")}${R(0, 8, 50, 100, "#eef1f3", 'rx="4"')}${R(0, 44, 50, 2, "#c9cfd3")}${R(42, 18, 3, 18, "#aab")}${R(42, 54, 3, 24, "#aab")}</g>`);
+      const cx = x + w / 2;
+      s.push(`<g><ellipse cx="${cx}" cy="${y + 240}" rx="34" ry="15" fill="rgba(0,0,0,.12)"/>${R(cx - 3, y + 228, 6, 12, "#999")}<ellipse cx="${cx}" cy="${y + 228}" rx="34" ry="16" fill="#fbfaf7" stroke="#ddd" stroke-width="2"/>
+        <rect x="${cx - 12}" y="${y + 222}" width="9" height="9" rx="2" fill="#fff" stroke="#bbb"/><rect x="${cx + 3}" y="${y + 224}" width="9" height="7" rx="2" fill="#ffd43b"/></g>`);
+      s.push(plantSvg(x + 22, y + 274, .85));
+      break;
+    }
+  }
+  return s.join("");
+}
+function floorplanSvg() {
+  const s = [];
+  s.push(`<defs>
+    <linearGradient id="gDaySky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9d4f2"/><stop offset="1" stop-color="#e7f3fb"/></linearGradient>
+    <linearGradient id="gNightSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10142a"/><stop offset="1" stop-color="#2a2f52"/></linearGradient>
+    <linearGradient id="gGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfe2ea"/><stop offset=".5" stop-color="#b3ccd8"/><stop offset="1" stop-color="#c7dbe4"/></linearGradient>
+    <linearGradient id="gGlassN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1c2236"/><stop offset="1" stop-color="#2b3350"/></linearGradient>
+    <linearGradient id="gWallShadow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity=".16"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+    <pattern id="pWood" width="60" height="16" patternUnits="userSpaceOnUse"><rect width="60" height="16" fill="#dcc5a2"/><rect y="15" width="60" height="1" fill="#c7ad86"/><rect x="38" width="1" height="16" fill="#cdb48e"/></pattern>
+    <pattern id="pWood2" width="60" height="16" patternUnits="userSpaceOnUse"><rect width="60" height="16" fill="#b58d66"/><rect y="15" width="60" height="1" fill="#9c7653"/><rect x="22" width="1" height="16" fill="#a5805c"/></pattern>
+    <pattern id="pTile" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="#c9ccd0"/><path d="M0 .5H30M.5 0V30" stroke="#b9bdc2"/></pattern>
+    <pattern id="pTile2" width="28" height="28" patternUnits="userSpaceOnUse"><rect width="28" height="28" fill="#e2ddd3"/><path d="M0 .5H28M.5 0V28" stroke="#d3cdc1"/></pattern>
+    <pattern id="pMarble" width="80" height="80" patternUnits="userSpaceOnUse"><rect width="80" height="80" fill="#efede8"/><path d="M0 .5H80M.5 0V80" stroke="#e0ddd6"/><path d="M8 60 Q30 44 46 52 T78 30" stroke="#e3e0d9" fill="none"/></pattern>
+    <pattern id="pConc" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#d6d8d9"/><circle cx="9" cy="12" r="1" fill="#c6c8ca"/><circle cx="29" cy="31" r="1.2" fill="#c6c8ca"/><path d="M0 .5H40M.5 0V40" stroke="#cbcdcf"/></pattern>
+    <pattern id="pAcoustic" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#3a3a41"/><circle cx="6" cy="6" r="1.2" fill="#44444c"/></pattern>
+    <pattern id="pDark" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#34343b"/><circle cx="5" cy="5" r="1" fill="#3d3d45"/></pattern>
+    <pattern id="pCheck" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#f1ede6"/><rect width="20" height="20" fill="#e3ddd3"/><rect x="20" y="20" width="20" height="20" fill="#e3ddd3"/></pattern>
+    <pattern id="pCorr" width="48" height="48" patternUnits="userSpaceOnUse"><rect width="48" height="48" fill="#e4e1db"/><path d="M0 .5H48M.5 0V48" stroke="#d6d2cb"/></pattern>
+  </defs>`);
+  s.push(R(0, 0, SW, SH, "#161618"));
+  // 간판
+  const g = SIGN;
+  s.push(`<g>${R(g.x, g.y, g.w, g.h, "#0b0b0c", 'rx="6"')}${R(g.x, g.y + g.h - 3, g.w, 3, "#ffd43b", 'opacity=".9"')}`);
+  const tx = g.x + (MOBILE ? 22 : 20), ty = MOBILE ? g.y + 46 : g.y + 41, fs = MOBILE ? 32 : 25;
+  s.push(`<g transform="translate(${tx} ${ty - fs * .82}) scale(${fs / 25})"><path d="M2 12 L13 3 L24 12" fill="none" stroke="#ffd43b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 11 V24 H20.5 V11" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/><rect x="11" y="16" width="4" height="8" fill="#ffd43b"/></g>`);
+  s.push(T(tx + fs * 1.3, ty, "부지런 공인중개사무소", fs, "#fff", 'class="xb" letter-spacing="-.3"'));
+  s.push(T(tx + fs * 1.3 + fs * 10.4, ty, "부지런한 사람이 집을 산다", MOBILE ? 17 : 12.5, "#8f8f94", 'font-weight="600"'));
+  s.push(`</g>`);
+  // 복도
+  for (const c of [...CORRS, ...(HALL ? [HALL] : [])]) s.push(`<rect x="${c.x}" y="${c.y}" width="${c.w}" height="${c.h}" fill="url(#pCorr)"/>`);
+  for (const c of CORRS) s.push(R(c.x + 30, c.cy - 16, (HALL ? HALL.x - 20 : c.x + c.w) - c.x - 40, 32, "#d2cec6", 'rx="6"'));
+  if (HALL) s.push(R(HALL.cx - 13, HALL.y - 40, 26, HALL.h + 80, "#d2cec6", 'rx="6"'));
+  const c0 = CORRS[0];
+  s.push(plantSvg(c0.x + 24, c0.y + c0.h - 22, .85));
+  if (!HALL) s.push(plantSvg(c0.x + c0.w - 24, c0.y + c0.h - 22, .85), plantSvg(c0.x + 690, c0.y + c0.h - 24, .7));
+  else s.push(plantSvg(c0.x + c0.w - 24, c0.y + 30, .7), plantSvg(CORRS[1].x + 24, CORRS[1].y + CORRS[1].h - 22, .85));
+  // 정수기 · 매물 안내 입간판
+  const wc = HALL ? [CORRS[1].x + 560, CORRS[1].y + 10] : [c0.x + 1120, c0.y + 10];
+  s.push(`<g transform="translate(${wc[0]} ${wc[1]})">${R(0, 0, 24, 10, "#bfd9ea", 'rx="3"')}${R(2, 10, 20, 32, "#eef2f4", 'rx="3"')}${R(8, 21, 8, 4, "#3a78b5", 'rx="1"')}</g>`);
+  const sb = HALL ? [c0.x + 420, c0.y + 8] : [c0.x + 300, c0.y + 8];
+  s.push(`<g transform="translate(${sb[0]} ${sb[1]})"><path d="M4 48 L14 0 L24 48" stroke="#555" stroke-width="2.5" fill="none"/>${R(0, 2, 28, 34, "#111", 'rx="2"')}${T(14, 15, "매물", 8, "#ffd43b", 'text-anchor="middle" class="xb"')}${T(14, 27, "안내", 8, "#fff", 'text-anchor="middle" class="xb"')}</g>`);
+  // 방
+  for (const z of ZONES) s.push(zoneSvg(z));
+  // 벽 (위쪽 방은 아래 벽, 아래쪽 방은 위 벽에 문)
+  const W = "#3b3835", TW = 8;
+  for (const z of ZONES) {
+    s.push(R(z.x - TW / 2, z.y, TW, z.h, W), R(z.x + z.w - TW / 2, z.y, TW, z.h, W));
+    const wy = z.top ? z.y + z.h - TW / 2 : z.y - TW / 2, d = z.doorX;
+    s.push(R(z.x, wy, d - 26 - z.x, TW, W), R(d + 26, wy, z.x + z.w - d - 26, TW, W));
+    s.push(R(d - 30, wy - 2, 5, TW + 4, "#77706a"), R(d + 25, wy - 2, 5, TW + 4, "#77706a"));
+    if (!z.top) s.push(`<rect x="${d - 26}" y="${z.y}" width="52" height="${WALL}" fill="url(#pCorr)"/>${R(d - 28, z.y, 4, WALL, "#77706a")}${R(d + 24, z.y, 4, WALL, "#77706a")}`);
+    if (z.top) s.push(R(z.x, z.y - TW / 2, z.w, TW, W));
+  }
+  // 쇼윈도 (앞 유리)
+  const st = STORE, dw = MOBILE ? 110 : 120, dx = st.x + st.w / 2 - dw / 2;
+  s.push(`<g>${R(st.x, st.y, st.w, st.h, "#1d1d20")}
+    <rect x="${st.x + 6}" y="${st.y + 6}" width="${st.w - 12}" height="${st.h - 12}" fill="url(#gGlass)" class="day-only"/>
+    <rect x="${st.x + 6}" y="${st.y + 6}" width="${st.w - 12}" height="${st.h - 12}" fill="url(#gGlassN)" class="night-only"/>
+    ${R(dx, st.y, dw, st.h, "#1d1d20")}${R(dx + 6, st.y + 6, dw / 2 - 8, st.h - 6, "rgba(190,215,226,.6)")}${R(dx + dw / 2 + 2, st.y + 6, dw / 2 - 8, st.h - 6, "rgba(190,215,226,.6)")}
+    ${R(dx + dw / 2 - 8, st.y + st.h / 2 - 2, 4, 16, "#c9c9c9", 'rx="2"')}${R(dx + dw / 2 + 4, st.y + st.h / 2 - 2, 4, 16, "#c9c9c9", 'rx="2"')}
+    ${[.25, .5, .75].map(f => R(Math.round(st.x + (dx - st.x) * f) - 2, st.y, 4, st.h, "#1d1d20")).join("")}
+    ${[.25, .5, .75].map(f => R(Math.round(dx + dw + (st.x + st.w - dx - dw) * f) - 2, st.y, 4, st.h, "#1d1d20")).join("")}
+    ${R(st.x, st.y, st.w, 4, "#ffd43b", 'opacity=".55"')}</g>`);
+  s.push(`<rect x="5" y="5" width="${SW - 10}" height="${SH - 10}" fill="none" stroke="#2a2826" stroke-width="10" rx="6"/>`);
+  return `<svg class="bg" viewBox="0 0 ${SW} ${SH}" style="width:${SW}px;height:${SH}px" aria-hidden="true">${s.join("")}</svg>`;
+}
+
+/* ===================== 사무실 만들기 ===================== */
+const scene = document.getElementById("scene"), viewport = document.getElementById("viewport"), sizer = document.getElementById("sizer");
+const people = {};
+const html = (tag, cls, style, inner = "") => { const e = document.createElement(tag); if (cls) e.className = cls; if (style) e.style.cssText = style; e.innerHTML = inner; return e; };
+const edgeCls = x => x < (MOBILE ? 210 : 140) ? " al" : x > SW - (MOBILE ? 210 : 140) ? " ar" : "";
+const plateHtml = m => `<b>${m.name}</b> ${m.role}${m.svc ? `<i class="sv">${m.svc}</i><i>${m.brief}</i>` : ""}`;
+function makeSeat(m, x, y, plate) {
+  const sw = m.big ? 76 : 64, sh = m.big ? 93 : 78;
+  const seat = html("div", "seat" + (m.big ? " big" : "") + edgeCls(x), `left:${x - sw / 2}px;top:${y - sh}px;z-index:${Math.round(y)}`);
+  if (m.floor) {
+    seat.classList.add("floor");
+    seat.innerHTML = personSvg(m, { walk: true }) + `<div class="plate fp">${plate}</div><div class="fx">${STAGES.find(s => s.main === m.id)?.icon || "✨"}</div><div class="bubble"></div>`;
+    seat.title = `${m.name} ${m.role}` + (m.svc ? ` · ${m.svc}` : "");
+    return seat;
+  }
+  const dw = m.big ? 120 : m.sofa != null ? 46 : m.stand ? 64 : m.counter ? 170 : 84;
+  const desk = m.sofa != null ? `<div class="desk sofa" style="left:${sw / 2 - dw / 2}px;width:${dw}px"><div class="plate"><b>${m.name}</b></div></div>`
+    : `<div class="desk${m.stand ? " stand" : m.counter ? " counter" : ""}" style="left:${sw / 2 - dw / 2}px;width:${dw}px">
+        ${m.big || m.stand ? "" : `<div class="mon"><i></i></div>`}<div class="paper"></div>${m.stand ? "" : `<div class="mug"></div>`}${m.counter || m.big ? `<div class="stamp"></div>` : ""}
+        <div class="plate">${plate}</div></div>`;
+  seat.innerHTML = (m.sofa != null || m.stand ? "" : `<svg class="chair" viewBox="0 0 58 71" preserveAspectRatio="none"><rect x="7" y="22" width="44" height="40" rx="10" fill="${m.big ? "#2b211b" : "#3a3a40"}"/></svg>`) +
+    personSvg(m) + desk + `<div class="fx">${STAGES.find(s => s.main === m.id && s.k !== "script")?.icon || "✨"}</div><div class="bubble"></div>`;
+  seat.title = `${m.name} ${m.role}` + (m.tool ? ` · ${m.tool}` : "");
+  return seat;
+}
+function buildOffice() {
+  scene.style.width = SW + "px"; scene.style.height = SH + "px";
+  scene.innerHTML = floorplanSvg();
+  for (const z of ZONES) {
+    scene.appendChild(html("div", "sign" + (z.top ? "" : " up"), `left:${z.x + 10}px;top:${z.top ? z.y + z.h + 6 : z.y - 6}px`, `${z.name} <small>${z.sub}</small>`)).id = "sign-" + z.id;
+    scene.appendChild(html("div", "zone-hl", `left:${z.x}px;top:${z.y}px;width:${z.w}px;height:${z.h}px`)).id = "hl-" + z.id;
+    scene.appendChild(html("div", "zone-dim", `left:${z.x}px;top:${z.y}px;width:${z.w}px;height:${z.h}px`)).id = "dim-" + z.id;
+  }
+  for (const c of [...CORRS, ...(HALL ? [HALL] : [])])
+    scene.appendChild(html("div", "zone-dim dim-corr", `left:${c.x}px;top:${c.y}px;width:${c.w}px;height:${c.h}px`));
+  for (const m of PEOPLE) {
+    const seat = makeSeat(m, m.x, m.y, plateHtml(m));
+    scene.appendChild(seat);
+    people[m.id] = { m, el: seat, homeEl: seat, home: { x: m.x, y: m.y, zone: m.zone }, pos: null, wk: null };
+  }
+  scene.appendChild(html("div", "slbl", `left:${vz.x + 12}px;top:${vz.y + 72}px`, `<b>대기석 · 아나운서 4명</b><i class="sv">Gemini TTS</i><i>대본을 사람 같은 목소리로 낭독</i>`));
+  // 간판 전광판
+  const L = MOBILE ? { x: SIGN.x + 16, y: SIGN.y + 62, w: SIGN.w - 32, h: 42 } : { x: SIGN.x + 760, y: SIGN.y + 12, w: SIGN.w - 772, h: 38 };
+  scene.appendChild(html("div", "ledb", `left:${L.x}px;top:${L.y}px;width:${L.w}px;height:${L.h}px`,
+    `<div class="scr"><div class="run" id="ledRun"><span>부지런 공인중개사무소 · 부지런한 사람이 집을 산다</span><span>부지런 공인중개사무소 · 부지런한 사람이 집을 산다</span></div><div class="gbar"><i id="ledBar"></i></div></div>`)).title = "채널 전광판";
+  const oz = ROOMS.ops;
+  scene.appendChild(html("div", "trophy-n", `left:${oz.x + 170}px;top:${oz.y + 31}px`, "")).id = "trophyN";
+  // 쇼윈도 매물 카드 자리
+  const st = STORE, dw = MOBILE ? 110 : 120, dx = st.x + st.w / 2 - dw / 2, k = MOBILE ? 2 : 3, pad = 12;
+  const areas = [[st.x + 8, dx - 6], [dx + dw + 6, st.x + st.w - 8]];
+  WINDOW_SLOTS.length = 0;
+  for (const [a, b] of areas) {
+    const cw = (b - a - pad * (k + 1)) / k;
+    for (let i = 0; i < k; i++) {
+      const el = html("div", "mc ph", `left:${a + pad + i * (cw + pad)}px;top:${st.y + 11}px;width:${cw}px;height:${st.h - 20}px`);
+      scene.appendChild(el); WINDOW_SLOTS.push(el);
+    }
+  }
+  scene.appendChild(html("div", "open", `left:${st.x + st.w / 2}px;top:${st.y + 10}px`, "휴식 중")).id = "openSign";
+  $("roster").innerHTML = PEOPLE.map(m => `<li><b>${m.name} <small>${m.role}</small></b>${m.svc ? `<em class="svl"><u>${m.svc}</u> ${m.svcDesc}</em>` : ""}<span>${m.does}</span></li>`).join("") +
+    `<li class="rm">방 9개 = 부서 9개 · 지금 일하는 방에 불이 켜져요</li>`;
+}
+const WINDOW_SLOTS = [];
+function fit() {
+  const cw = viewport.clientWidth, s = MOBILE ? cw / SW : Math.max(cw / SW, .5);
+  scene.style.transform = `scale(${s})`;
+  sizer.style.width = SW * s + "px"; sizer.style.height = SH * s + "px";
+  const m = MOBILE && s < .62;
+  scene.classList.toggle("m", m);
+  scene.classList.toggle("md", !m && s < .85);
+  scene.classList.toggle("bb", !MOBILE && s < .66);
+  fit.s = s;
+}
+let lastTouch = 0, autoScrolling = false;
+viewport.addEventListener("scroll", () => { if (!autoScrolling) lastTouch = Date.now(); }, { passive: true });
+function follow(x) {
+  if (viewport.scrollWidth <= viewport.clientWidth + 4 || Date.now() - lastTouch < 15000) return;
+  autoScrolling = true;
+  viewport.scrollTo({ left: x * fit.s - viewport.clientWidth / 2, behavior: "smooth" });
+  setTimeout(() => autoScrolling = false, 900);
+}
+function personFor(e) {
+  if (e.dept === "script" && (e.who === "gemini" || !e.who)) return people.copy;
+  if (P[e.who]) return people[e.who];
+  if (VOICE_BY_KEY[e.who]) return people[VOICE_BY_KEY[e.who].id];
+  if (/^eleven:/.test(e.who || "")) { const vs = PEOPLE.filter(p => p.vkey); return people[vs[[...e.who].reduce((a, c) => a + c.charCodeAt(0), 0) % vs.length].id]; }
+  return people[DEPT_DEFAULT[e.dept] || "pd"];
+}
+
+/* ===================== 말풍선·걷기 ===================== */
+function say(p, text, cls = "", ms = 5200) {
+  if (!p) return;
+  const host = p.wk || p.el;
+  const b = host.querySelector(".bubble");
+  b.className = "bubble " + cls; b.textContent = text;
+  requestAnimationFrame(() => b.classList.add("show"));
+  const el = p.el;
+  el.classList.add("talking");
+  if (!p.wk) el.style.zIndex = 3150;          // 말하는 동안 어두운 방 · 이름표 위로
+  clearTimeout(p.tTalk); clearTimeout(p.tBub);
+  p.tTalk = setTimeout(() => el.classList.remove("talking"), Math.min(ms, 2600));
+  p.tBub = setTimeout(() => { b.classList.remove("show"); if (el.style.zIndex == 3150) el.style.zIndex = Math.round(p.home.y); }, ms);
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const SPEED = () => fast ? 300 : 115;
+function route(a, b) {
+  if (a.zone === b.zone) {
+    if (isCorr(a.zone)) return [a, b];
+    const z = zoneOf(a.zone), iy = innerY(z);
+    return [a, { x: a.x + (a.x < b.x ? 30 : -30), y: iy }, { x: b.x + (a.x < b.x ? -30 : 30), y: iy }, b];
+  }
+  const out = loc => {
+    if (isCorr(loc.zone)) return [loc, { x: loc.x, y: zoneOf(loc.zone).cy }];
+    const z = zoneOf(loc.zone), iy = innerY(z);
+    return [loc, { x: loc.x + (loc.x < z.doorX ? 30 : -30), y: iy }, { x: z.doorX, y: iy }, { x: z.doorX, y: z.corr.cy }];
+  };
+  const corrOf = loc => isCorr(loc.zone) ? zoneOf(loc.zone) : zoneOf(loc.zone).corr;
+  const ca = corrOf(a), cb = corrOf(b);
+  const via = ca === cb || !HALL ? [] : [{ x: HALL.cx, y: ca.cy }, { x: HALL.cx, y: cb.cy }];
+  return [...out(a), ...via, ...out(b).reverse()];
+}
+function move(wk, pts) {
+  let t = 0; const times = [0];
+  for (let i = 1; i < pts.length; i++) { t += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y) / SPEED(); times.push(t); }
+  const total = Math.max(t, .2);
+  wk.classList.remove("still");
+  const anim = wk.animate(pts.map((q, i) => ({ transform: `translate(${q.x - 32}px, ${q.y - 78}px)`, offset: times[i] / total })),
+    { duration: total * 1000, fill: "forwards" });
+  return anim.finished.then(() => wk.classList.add("still"));
+}
+let walking = 0;
+const walkerHtml = (p, o) => personSvg(p.m, { walk: true, ...o }) + `<div class="bubble"></div>`;
+async function goTo(p, to, carry = "") {
+  if (!p) return;
+  if (!p.wk) {
+    p.wk = html("div", "walker" + edgeCls(p.m.x), "", walkerHtml(p, { carry }));
+    scene.appendChild(p.wk); p.el.classList.add("away"); p.pos = p.pos || p.home; walking++;
+  } else p.wk.innerHTML = walkerHtml(p, { carry });
+  const pts = route(p.pos, to); p.pos = to;
+  await move(p.wk, pts);
+}
+async function goHome(p, cup = false) {
+  if (!p?.wk) return;
+  p.wk.innerHTML = walkerHtml(p, { cup });
+  await move(p.wk, route(p.pos, p.home));
+  p.wk.remove(); p.wk = null; p.pos = null; p.el.classList.remove("away"); walking--;
+}
+async function errand(p, to, { carry = "", text = "", stay = 0, cup = false, onArrive } = {}) {
+  if (!p || p.wk || p.busy || !p.m.floor) return;
+  p.busy = true;
+  try {
+    await goTo(p, to, carry);
+    if (text) say(p, text, "rep", stay || (fast ? 1800 : 3800));
+    onArrive && onArrive();
+    await sleep(stay || (text ? (fast ? 1800 : 3800) : 700));
+    await goHome(p, cup);
+  } finally { p.busy = false; }
+}
+function confetti(x, y) {
+  const colors = ["#ffd43b", "#ffffff", "#111111", "#ffe58a", "#bdbdbd"];
+  for (let i = 0; i < 40; i++) {
+    const c = html("div", "confetti", `left:${x}px;top:${y}px;background:${colors[i % 5]}`);
+    c.style.setProperty("--dx", (Math.random() - .5) * 320 + "px");
+    c.style.setProperty("--dy", (Math.random() * .8 + .1) * 160 + "px");
+    c.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
+    scene.appendChild(c); setTimeout(() => c.remove(), 1900);
+  }
+}
+
+/* ===================== 상태 반영 ===================== */
+let state = null, fast = false, curStage = "idle", recording = null;
+const seen = new Set();
+const $ = id => document.getElementById(id);
+const z2 = n => String(n).padStart(2, "0");
+const kst = t => new Date(new Date(t).getTime() + 9 * 3600e3);
+const fmtT = iso => { if (!iso) return ""; const d = kst(iso); return `${z2(d.getUTCHours())}:${z2(d.getUTCMinutes())}`; };
+const fmtDT = iso => { if (!iso) return ""; const d = kst(iso); return `${z2(d.getUTCMonth() + 1)}/${z2(d.getUTCDate())} ${z2(d.getUTCHours())}:${z2(d.getUTCMinutes())}`; };
+const fmtD = iso => { if (!iso) return ""; const d = kst(iso); return `${z2(d.getUTCMonth() + 1)}/${z2(d.getUTCDate())}`; };
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const kstHour = () => kst(Date.now()).getUTCHours();
+const nightNow = () => { const h = kstHour(); return h >= 23 || h < 6; };
+
+function isWorking() {
+  if (!state?.run || state.run.status !== "working") return false;
+  return Date.now() - new Date(state.updated || 0) < 3 * 3600e3;
+}
+function markWorking() {
+  const st = STAGE[curStage];
+  for (const p of Object.values(people)) p.el.classList.toggle("working", !!st && p.m.id === st.main && p.m.id !== "pd");
+}
+function setStage(stage) {
+  curStage = STAGE[stage] ? stage : "idle";
+  const st = STAGE[curStage];
+  scene.dataset.stage = st ? st.k : "";
+  for (const z of ZONES) { $("hl-" + z.id).classList.toggle("on", z.id === st?.zone); $("sign-" + z.id).classList.toggle("on", z.id === st?.zone); }
+  markWorking();
+  if (st) follow(ROOMS[st.zone].x + ROOMS[st.zone].w / 2);
+  if (curStage !== "voice" && recording) { const r = recording; recording = null; scene.classList.remove("rec"); goHome(r); }
+  $("openSign").textContent = st ? "근무 중 OPEN" : "휴식 중";
+  $("openSign").classList.toggle("on", !!st);
+  updateNight();
+}
+function updateNight() {
+  const night = nightNow(), dusk = night || kstHour() >= 19 || kstHour() < 7;
+  scene.classList.toggle("night", dusk);
+  const zone = STAGE[curStage]?.zone;
+  for (const z of ZONES) {
+    const lit = zone ? (z.id === zone || (meetingOn && z.id === "plan")) : (!night || z.id === "ops" || (meetingOn && z.id === "plan"));
+    $("dim-" + z.id).classList.toggle("on", !lit);
+  }
+  document.querySelectorAll(".dim-corr").forEach(d => d.classList.toggle("on", night && !zone));
+  for (const p of Object.values(people)) p.el.classList.toggle("sleeping", night && !zone && p.m.id !== "ceo" && !p.wk);
+}
+function nextShift() {
+  const d = kst(Date.now()), mins = d.getUTCHours() * 60 + d.getUTCMinutes();
+  const shifts = [[2, 23], [5, 23], [10, 23], [22, 23]].map(([h, m]) => h * 60 + m);
+  const nx = shifts.find(s => s > mins) ?? shifts[0];
+  return `${z2(Math.floor(nx / 60))}:${z2(nx % 60)}`;
+}
+function renderStatus() {
+  const pill = $("status"), w = isWorking() || fast, failed = state?.run?.status === "failed";
+  pill.className = "pill " + (w ? "working" : failed ? "failed" : "idle");
+  const st = STAGE[curStage];
+  $("statusText").textContent = fast ? "지난 근무 다시보기 중" : w ? `근무 중 · ${st ? ROOMS[st.zone].name : "준비"}` :
+    failed ? "문제 발생 (다음 근무 때 재시도)" : `휴식 중 · 다음 출근 ${nextShift()}`;
+}
+const STEP_KEYS = ["idea", "plan", "script", "review", "voice", "footage", "edit", "publish"];
+function renderProject() {
+  const c = state?.current || {}, body = $("projBody"), working = isWorking() || fast;
+  if (!working || !(c.category || c.slot || c.publish_at)) {
+    const up = boardNow().upcoming;
+    body.className = "empty";
+    body.innerHTML = working ? "박 경비가 사무실 문을 열고 준비 중이에요. 곧 김 사무장이 이번 회차를 정합니다." :
+      `지금은 쉬는 시간이에요 ☕<br>공개를 기다리는 매물(영상) <b>${up.length}편</b>이 유튜브에 예약돼 있어요.<br>다음 출근 <b>${nextShift()}</b> — 빈 회차가 있으면 바로 만들기 시작합니다.`;
+    return;
+  }
+  const steps = STEP_KEYS.map(k => STAGE[k]), idx = steps.findIndex(s => s.k === curStage), v = VOICE_BY_KEY[c.voice];
+  const lbl = c.label || LABELS[c.category] || "";
+  body.className = "";
+  body.innerHTML = `<div class="meta">${lbl ? `<span class="chip">${esc(lbl)}</span>` : ""}${c.publish_at ? `${fmtDT(c.publish_at)} 공개 예정` : "바로 공개"}</div>
+    <div class="ttl">${esc(c.title || (c.topic ? "제목 다듬는 중…" : "주제 고르는 중…"))}</div>
+    <div class="tp">${c.topic ? "주제 · " + esc(c.topic) : c.idea ? "대표님 아이디어 · " + esc(c.idea) : "이 팀장이 주제를 고르는 중…"}${v ? `<br>낭독 · ${v.name} 아나운서` : ""}</div>
+    <div class="steps">${steps.map((s, i) => `<div class="st ${i < idx ? "done" : i === idx ? "now" : ""}"><i>${s.icon}</i>${s.label}</div>`).join("")}</div>
+    ${curStage === "footage" && c.progress != null ? `<div class="bar"><b style="width:${Math.round(c.progress * 100)}%"></b></div>` : ""}`;
+}
+// 게시판은 근무가 끝날 때 만든 것 → 공개 시각이 지난 예약분은 '계약 완료(공개됨)'로 옮김
+function boardNow() {
+  const b = state?.board || {}, now = Date.now(), aired = x => new Date(x.publish_at) <= now;
+  const upAll = b.upcoming || [];
+  return { total: b.total, upcoming: upAll.filter(x => !aired(x)), published: [...upAll.filter(aired).reverse(), ...(b.published || [])] };
+}
+const viewsOf = id => { const t = (state?.stats?.top || []).find(v => v.id && v.id === id); return t ? t.views : null; };
+function renderBoard() {
+  const b = boardNow(), up = b.upcoming.slice(0, 6);
+  const todo = (isWorking() || fast) ? (state.current?.todo || []) : [];
+  const lab = x => esc(x.label || LABELS[x.category] || "부동산");
+  let h = up.map(x => `<li class="lst"><span class="no">${fmtD(x.publish_at)}<small>${fmtT(x.publish_at)}</small></span>
+      <span class="t">${esc(x.title)}</span><span class="s"><span class="c">${lab(x)}</span>공개 예약 매물</span></li>`).join("");
+  h += todo.filter(t => !up.some(u => fmtDT(u.publish_at) === t)).map(t => `<li class="lst todo"><span class="no">${esc(t.split(" ")[0] || "")}<small>${esc(t.split(" ")[1] || "")}</small></span>
+      <span class="t">매물 준비 중…</span><span class="s">지금 사무실에서 만드는 중</span></li>`).join("");
+  const pub = b.published.slice(0, 3).map(x => { const v = viewsOf(x.video_id);
+    return `<li class="lst done"><span class="no">${fmtD(x.publish_at)}<small>공개</small></span>
+      <span class="t">${x.video_id ? `<a href="https://youtube.com/shorts/${esc(x.video_id)}" target="_blank" rel="noopener">${esc(x.title)}</a>` : esc(x.title)}</span>
+      <span class="s"><span class="c">${lab(x)}</span>${v != null ? `조회수 ${num(v)}회` : "공개 완료"}</span><span class="stamp">계약 완료</span></li>`; }).join("");
+  $("sched").innerHTML = (h || `<li class="lst todo"><span class="no">—<small></small></span><span class="t">예약된 매물이 없어요</span><span class="s">다음 출근 때 채워요</span></li>`) +
+    (pub ? `<li class="sub-h">최근 계약 완료 (공개됨)</li>` + pub : "");
+  $("total").textContent = b.total ? `누적 ${b.total}건` : "";
+  $("trophyN").textContent = b.total ? b.total + "건" : (state?.stats?.videos ? state.stats.videos + "건" : "");
+  $("jsNo").textContent = String(b.total || state?.stats?.videos || 0).padStart(4, "0");
+  // 쇼윈도
+  const cards = [...up.map(x => ({ x, done: false })), ...b.published.slice(0, 6).map(x => ({ x, done: true }))];
+  WINDOW_SLOTS.forEach((el, i) => {
+    const c = cards[i];
+    if (!c) { el.className = "mc ph"; el.innerHTML = `<div class="mh"><span>매물</span><em></em></div><b>준비 중</b><i>부지런 공인중개사무소</i>`; return; }
+    el.className = "mc" + (c.done ? " done" : "");
+    el.innerHTML = `<div class="mh"><span>${c.done ? "공개" : "매물"}</span><em>${c.done ? fmtD(c.x.publish_at) : fmtDT(c.x.publish_at)}</em></div><b>${esc(c.x.title)}</b><i>${lab(c.x)}</i>`;
+  });
+}
+/* 구독자 목표: 첫 목표 500명, 넘으면 다음 단계로 */
+const GOALS = [GOAL1, 1000, 5000, 10000, 50000, 100000, 500000, 1000000];
+const num = n => Number(n || 0).toLocaleString("ko-KR");
+const short = n => n >= 10000 ? (n / 10000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, "") + "만" : num(n);
+const sign1 = n => (n > 0 ? "+" : n < 0 ? "−" : "") + Math.abs(n).toFixed(1).replace(/\.0$/, "");
+function diffTag(now, prev) {
+  if (prev == null) return `<i class="eq">기록 쌓는 중</i>`;
+  const d = now - prev;
+  return d > 0 ? `<i>▲ ${num(d)} 어제보다</i>` : d < 0 ? `<i class="dn">▼ ${num(-d)} 어제보다</i>` : `<i class="eq">어제와 같음</i>`;
+}
+function renderStats() {
+  const s = state?.stats;
+  if (!s) {
+    $("goalBody").className = $("statsBody").className = "empty";
+    $("goalBody").innerHTML = $("statsBody").innerHTML = "다음 퇴근(업무 끝) 때 유튜브에서 숫자를 받아와요.";
+    return;
+  }
+  const subs = s.subs || 0, gi = GOALS.findIndex(g => subs < g), goal = GOALS[gi < 0 ? GOALS.length - 1 : gi];
+  const prevGoal = gi > 0 ? GOALS[gi - 1] : 0, pct = Math.min(100, subs / goal * 100);
+  const rate = +s.subs_per_day || 0, eta = rate > 0 && subs < goal ? Math.ceil((goal - subs) / rate) : null;
+  $("goalNo").textContent = gi <= 0 ? "첫 번째 목표" : `${gi + 1}번째 목표`;
+  $("goalBody").className = "";
+  $("goalBody").innerHTML = `<div class="now"><b>${num(subs)}</b><span>/ ${num(goal)}명</span><em>${pct < 10 ? pct.toFixed(1) : Math.floor(pct)}%</em></div>
+    <div class="bar"><b style="width:${Math.max(pct, 1.5)}%"></b></div>
+    <div class="left">${prevGoal ? `🎉 ${num(prevGoal)}명 돌파! ` : ""}목표까지 <b>${num(goal - subs)}명</b> 남았어요</div>
+    ${eta != null ? `<div class="eta">📈 이 속도(하루 ${sign1(rate)}명)면 <b>약 ${num(eta)}일 뒤</b> ${num(goal)}명</div>` : ""}
+    <div class="ladder">${GOALS.slice(0, Math.max(gi + 3, 4)).map((g, i) => `<span class="${subs >= g ? "ok" : i === gi ? "cur" : ""}">${subs >= g ? "✓ " : ""}${short(g)}</span>`).join("")}</div>`;
+  $("goalPill").style.display = "";
+  $("goalPillText").textContent = `${num(subs)} / ${num(goal)}`;
+
+  const hist = state?.stats_hist || [], prev = hist.length > 1 ? hist[hist.length - 2] : null;
+  const started = s.started ? new Date(s.started + (s.started.length <= 10 ? "T00:00:00+09:00" : "")) : null;
+  const stLabel = started && !isNaN(started) ? `${kst(started).getUTCFullYear()}.${z2(kst(started).getUTCMonth() + 1)}.${z2(kst(started).getUTCDate())}` : "";
+  const r7 = s.subs_per_day_7d;
+  $("statsAt").textContent = s.at ? `${fmtDT(s.at)} 기준` : "";
+  $("statsBody").className = "";
+  $("statsBody").innerHTML = `${stLabel || s.subs_per_day != null ? `<div class="since">
+      <div><small>자동화 업로드 시작일</small><b>${stLabel || "—"}${s.days ? `<em>D+${num(s.days)}</em>` : ""}</b><i>매일 4편 자동 제작 · 예약</i></div>
+      <div><small>하루 평균 구독자</small><b>${s.subs_per_day != null ? sign1(+s.subs_per_day) : "—"}<u>명/일</u></b>${r7 != null ? `<i class="up">최근 7일 ${sign1(+r7)}명/일</i>` : `<i>시작 이후 평균</i>`}</div>
+    </div>` : ""}
+    <div class="stats">
+      <div><small>구독자</small><b>${s.hidden ? "비공개" : num(subs)}</b>${diffTag(subs, prev?.subs)}</div>
+      <div><small>총 조회수</small><b>${short(Math.max(s.views || 0, s.shorts_views || 0))}</b>${diffTag(s.views, prev?.views)}</div>
+      <div><small>영상</small><b>${num(s.videos)}개</b><i class="eq">좋아요 ${num(s.shorts_likes)}</i></div>
+    </div>
+    ${(s.top || []).length ? `<div class="top-h">🏆 조회수 TOP ${s.top.length}</div><ul class="top">${s.top.map((v, i) =>
+      `<li><span>${i + 1}</span><a href="https://youtube.com/shorts/${esc(v.id)}" target="_blank" rel="noopener">${esc(v.title)}</a><em>${num(v.views)}회</em></li>`).join("")}</ul>` : ""}`;
+
+  const d = prev ? subs - prev.subs : null;
+  const msg = `구독자 <b>${num(subs)}</b> / ${num(goal)}명 · 목표까지 ${num(goal - subs)}명` + (d > 0 ? ` · 오늘 <b>+${num(d)}</b>명` : "") +
+    (rate > 0 ? ` · 하루 평균 ${sign1(rate)}명` : "") + (s.days ? ` · 자동화 D+${num(s.days)}` : "") +
+    ` · 총 조회수 <b>${num(Math.max(s.views || 0, s.shorts_views || 0))}</b>회` + (s.top?.[0] ? ` · 인기 1위 '${esc(s.top[0].title)}' ${num(s.top[0].views)}회` : "") + ` · 부지런한 사람이 집을 산다`;
+  $("ledRun").innerHTML = `<span>${msg}</span><span>${msg}</span>`;
+  $("ledBar").style.width = Math.max(pct, 2) + "%";
+
+  const reached = GOALS.filter(g => subs >= g).pop();
+  let seenGoal = 0;
+  try { seenGoal = +localStorage.getItem("buzirun-goal") || 0; } catch {}
+  if (reached && reached > seenGoal && !DEMO) {
+    try { localStorage.setItem("buzirun-goal", reached); } catch {}
+    const ceo = people.ceo;
+    setTimeout(() => { follow(ceo.home.x); confetti(ceo.home.x, ceo.home.y - 80); say(ceo, `구독자 ${num(reached)}명 돌파!! 모두 고마워요 🎉`, "rep", 6000); }, 1500);
+  }
+}
+function renderLog(fresh = new Set()) {
+  const log = (state?.log || []).slice(-60).reverse();
+  $("log").innerHTML = log.map(e => { const p = personFor(e);
+    return `<li class="${e.kind === "error" ? "err" : e.kind === "report" ? "rep" : ""} ${fresh.has(e.t + e.msg) ? "new" : ""}">
+    <time>${fmtT(e.t)}</time><div><span class="who">${p ? p.m.name : ""}</span>${esc(e.msg)}</div></li>`; }).join("") ||
+    `<li><time></time><div class="empty">아직 업무 기록이 없어요. 첫 출근(${nextShift()})부터 한 줄씩 쌓여요.</div></li>`;
+  $("updated").textContent = state?.updated ? `${fmtT(state.updated)} 갱신` : "";
+}
+
+/* 새 보고를 하나씩 연출 */
+const queue = [];
+let playing = false;
+function enqueue(events) { queue.push(...events); if (!playing) playNext(); }
+async function playNext() {
+  if (!queue.length) { playing = false; return; }
+  playing = true;
+  await perform(queue.shift());
+  setTimeout(playNext, fast ? 800 : 1400);
+}
+async function perform(e) {
+  const p = personFor(e);
+  if (e.stage && e.stage !== curStage) {
+    const prev = STAGE[curStage], next = STAGE[e.stage];
+    // 김 사무장이 앞 단계 서류를 들고 다음 담당자에게 전달
+    if (prev && next && prev.zone !== next.zone && next.main !== "pd" || next?.k === "voice" && prev && prev.zone !== next.zone) {
+      const pd = people.pd;
+      if (!pd.wk && !pd.busy) {
+        const tgt = next.k === "voice" ? people.kore.home : people[next.main].home;
+        errand(pd, { x: tgt.x + (tgt.x > ROOMS[tgt.zone].x + ROOMS[tgt.zone].w - 80 ? -56 : 56), y: Math.min(tgt.y + 26, ROOMS[tgt.zone].y + ROOMS[tgt.zone].h - 14), zone: tgt.zone },
+          { carry: "📄", text: "다음 단계 부탁해요!" });
+      }
+    }
+    setStage(e.stage);
+  }
+  if (fast) projectFrom(e);
+  if (e.kind === "report" && e.dept === "publish") {
+    const ceo = people.ceo, pd = people.pd;
+    say(p, e.msg, "rep", fast ? 2600 : 6000);
+    const cheer = () => { follow(ceo.home.x); confetti(ceo.home.x, ceo.home.y - 80); setTimeout(() => say(ceo, "수고했어요! 최고예요 👏", "rep", 3400), 900); };
+    await sleep(fast ? 400 : 1200);
+    if (!pd.wk && !pd.busy) await errand(pd, { x: ceo.home.x + 70, y: ceo.home.y + 52, zone: "ops" }, { carry: "📮", text: "대표님! 예약 접수 완료 보고입니다", onArrive: cheer });
+    else cheer();
+    return;
+  }
+  // 뽑힌 아나운서는 방음 부스로 들어가 녹음, 끝나면 대기석으로
+  if (p?.m.vkey && /녹음 시작|낭독할게요/.test(e.msg) && !recording && !p.wk) {
+    recording = p; scene.classList.add("rec");
+    say(p, e.msg, "", fast ? 2000 : 3500);
+    await goTo(p, MIC);
+    return;
+  }
+  if (p?.m.vkey && /넘길게요/.test(e.msg) && recording === p) {
+    say(p, e.msg, "err", fast ? 2400 : 4500);
+    recording = null; scene.classList.remove("rec");
+    await sleep(fast ? 600 : 1500); goHome(p);
+    return;
+  }
+  if (p) {
+    say(p, e.msg, e.kind === "error" ? "err" : e.kind === "report" ? "rep" : "", fast ? 2600 : 6000);
+    if (e.kind === "error") { p.el.classList.add("worried"); setTimeout(() => p.el.classList.remove("worried"), 8000); }
+  }
+  if (e.kind === "end") {
+    ["actions", "discord", "copy", "reviewer", "pixabay", "ffmpeg", "youtube"].forEach((id, i) =>
+      setTimeout(() => say(people[id], ["문단속은 제가 할게요 🔑", "수고하셨어요~", "내일 주제도 기대해 주세요!", "오늘도 오류 0건 ⚖️", "내일도 현장 출동!", "렌더링 끝, 퇴근!", "예약 접수 완료 📮"][i], "small", 3000), 300 * i));
+  }
+}
+let replayCur = {};
+function projectFrom(e) {
+  if (e.kind === "start") replayCur = {};
+  const m = e.msg; let k;
+  if ((k = m.match(/만들 회차 \d+개: (.+)/))) replayCur.todo = k[1].split(", ");
+  if (e.dept === "idea" && e.stage === "idea" && /접수함 확인/.test(m)) replayCur = { slot: "x", todo: replayCur.todo };
+  if ((k = m.match(/아이디어 접수! "(.+)"/))) replayCur.idea = k[1];
+  if ((k = m.match(/이번 건은 '(.+)'로/))) { replayCur.label = k[1]; replayCur.category = "x"; }
+  if ((k = m.match(/주제 확정: (.+)/))) replayCur.topic = k[1];
+  if ((k = m.match(/제목 '(.+)', 문장/))) replayCur.title = k[1];
+  if (VOICE_BY_KEY[e.who]) replayCur.voice = e.who;
+  if (e.stage === "footage" && (k = m.match(/\[(\d+)\/(\d+)\]/))) replayCur.progress = k[1] / k[2];
+  state = { ...state, current: replayCur };
+  renderProject();
+}
+
+/* ===================== 데이터 ===================== */
+let lastUpdated = null;
+async function fetchState() {
+  if (DEMO) return demoState();
+  const res = await fetch(`https://api.github.com/gists/${GIST_ID}`, { cache: "no-cache", headers: { Accept: "application/vnd.github+json" } });
+  if ((res.status === 403 || res.status === 429) && res.headers.get("x-ratelimit-reset")) {
+    const err = new Error("rate"); err.until = +res.headers.get("x-ratelimit-reset") * 1000; throw err;
+  }
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const g = await res.json();
+  if (g.updated_at === lastUpdated) return null;
+  lastUpdated = g.updated_at;
+  const f = g.files && g.files["office.json"];
+  if (!f) return {};
+  return JSON.parse(f.truncated ? await (await fetch(f.raw_url)).text() : f.content || "{}");
+}
+let pollDelay = POLL_MS, lastPoll = 0, pollTimer = null;
+async function poll() {
+  clearTimeout(pollTimer);
+  if (document.hidden && !DEMO) { pollTimer = setTimeout(poll, 5000); return; }
+  if (!DEMO && Date.now() - lastPoll < pollDelay - 1000) { pollTimer = setTimeout(poll, pollDelay - (Date.now() - lastPoll)); return; }
+  lastPoll = Date.now();
+  try {
+    const s = await fetchState();
+    if (s && !fast) apply(s);
+    pollDelay = POLL_MS;
+    const empty = !DEMO && state && !(state.log || []).length;   // 아직 첫 근무 전 (통계만 있을 수 있음)
+    $("banner").classList.toggle("show", DEMO || !!empty);
+    if (DEMO) $("banner").innerHTML = "🧪 <b>데모 모드</b> — 예시 근무를 반복해서 보여주고 있어요. <a href=\"?\">실제 현황 보기</a>";
+    else if (empty) $("banner").innerHTML = `🔑 아직 근무 기록이 없어요. ${state.stats ? "채널 통계는 이미 들어와 있고, " : ""}다음 출근(${nextShift()})부터 직원들이 일하는 모습이 실시간으로 보여요. <a href="?demo">예시 근무 미리보기 →</a>`;
+  } catch (err) {
+    pollDelay = err.until ? Math.max(err.until - Date.now() + 2000, POLL_MS) : Math.min(pollDelay * 2, 600000);
+    $("statusText").textContent = err.until ? `잠시 쉬는 중 (GitHub 조회 한도) · ${fmtT(new Date(err.until).toISOString())} 재개` : "연결 재시도 중…";
+  }
+  pollTimer = setTimeout(poll, DEMO ? 2500 : pollDelay);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && !DEMO) poll(); });
+const keyOf = e => e.t + e.msg;
+function apply(s) {
+  const first = state === null;
+  state = s;
+  const log = s.log || [];
+  let fresh = [];
+  if (first) {
+    log.forEach(e => seen.add(keyOf(e)));
+    setStage(isWorking() ? (s.stage || "idle") : "idle");
+    const last = log[log.length - 1];
+    if (last && isWorking()) setTimeout(() => perform({ ...last, stage: null }), 800);
+  } else {
+    fresh = log.filter(e => !seen.has(keyOf(e)));
+    fresh.forEach(e => seen.add(keyOf(e)));
+    if (!isWorking() && curStage !== "idle" && !fresh.length && !queue.length) setStage("idle");
+  }
+  renderStatus(); renderProject(); renderBoard(); renderStats(); renderLog(new Set(fresh.map(keyOf)));
+  if (fresh.length) enqueue(fresh);
+}
+
+$("replayBtn").addEventListener("click", () => {
+  if (fast || !state?.log?.length) { if (!state?.log?.length) say(people.pd, "아직 다시 볼 근무 기록이 없어요. 다음 출근 때 쌓여요!", "", 4000); return; }
+  const log = state.log;
+  let i = log.map(e => e.kind).lastIndexOf("start");
+  if (isWorking() && i > 0) i = log.slice(0, i).map(e => e.kind).lastIndexOf("start");
+  if (i < 0) { say(people.pd, "아직 다시 볼 근무 기록이 없어요. 다음 출근 때 쌓여요!", "", 4000); return; }
+  const events = log.slice(i), saved = state;
+  fast = true; queue.length = 0; replayCur = {}; lastTouch = 0;
+  setStage("setup"); renderStatus();
+  $("replayBtn").innerHTML = "⏹ 다시보기 중…";
+  queue.push(...events);
+  const wait = () => queue.length || playing || walking ? setTimeout(wait, 500) : setTimeout(() => {
+    fast = false; state = saved; setStage(isWorking() ? saved.stage : "idle");
+    renderStatus(); renderProject(); renderBoard();
+    $("replayBtn").innerHTML = '⏪ <span class="lg">지난 근무 </span>다시보기';
+  }, 1200);
+  if (!playing) playNext();
+  setTimeout(wait, 1000);
+});
+
+/* ===================== 한가할 때 일상 ===================== */
+function idleLife() {
+  setTimeout(idleLife, 4000 + Math.random() * 3500);
+  if (document.hidden || fast) return;
+  const busy = STAGE[curStage]?.main;
+  const pool = Object.values(people).filter(p => p.m.id !== busy && !p.wk && !p.busy && p !== recording && !p.el.classList.contains("sleeping"));
+  if (!pool.length) return;
+  const p = pool[Math.floor(Math.random() * pool.length)];
+  if (p.m.floor && Math.random() < .4 && walking < 2 && !(curStage !== "idle" && p.m.id === "pd")) {
+    const spots = pantrySpots(), spot = spots[Math.floor(Math.random() * spots.length)];
+    errand(p, spot, { cup: true, text: ["커피 한잔 ☕", "물 한 컵 마시고 올게요", "잠깐 기지개 쭉~", "믹스커피가 최고지"][Math.floor(Math.random() * 4)], stay: 3500 });
+  } else {
+    const shown = [...document.querySelectorAll(".bubble.show")].map(b => b.textContent);
+    const lines = (SMALLTALK[p.m.id] || []).filter(l => !shown.includes(l));
+    if (lines.length) say(p, lines[Math.floor(Math.random() * lines.length)], "small", 3600);
+  }
+}
+
+/* ===================== 기획실 회의 ===================== */
+let meetingOn = false;
+const pickOne = a => a[Math.floor(Math.random() * a.length)];
+function meetingAgenda() {
+  const s = state?.stats, up = boardNow().upcoming, ag = [];
+  if (s) {
+    const gi = GOALS.findIndex(g => s.subs < g), goal = GOALS[gi < 0 ? GOALS.length - 1 : gi], rate = +s.subs_per_day || 0;
+    ag.push({ who: ["pd", "youtube", "gemini", "reviewer"], lines: [
+      ["pd", "📢 성과 회의 시작할게요!"],
+      ["youtube", `구독자 ${num(s.subs)}명! 목표 ${num(goal)}명까지 ${num(goal - s.subs)}명 남았어요`],
+      ...(rate > 0 ? [["pd", `하루 평균 ${sign1(rate)}명이면 약 ${num(Math.ceil((goal - s.subs) / rate))}일 뒤 도착이네요`]] : []),
+      ...(s.top?.[0] ? [["gemini", `조회수 1위는 '${s.top[0].title}' ${num(s.top[0].views)}회예요`]] : []),
+      ["reviewer", pickOne(["반응 좋아도 과장은 금지! 사실대로 갑시다", "숫자 나오는 주제는 제가 더 꼼꼼히 볼게요"])],
+      ["pd", "좋아요, 오늘도 부지런히! 👏"]] });
+  }
+  if (up.length) ag.push({ who: ["pd", "youtube", "gemini", "reviewer"], lines: [
+    ["pd", "📢 편성 회의 할게요. 매물 게시판 봅시다"],
+    ["youtube", `예약 ${up.length}건 대기 중! 다음은 ${fmtDT(up[0].publish_at)} 공개예요`],
+    ["gemini", `'${up[0].title}' 카피 자신 있어요 ✍️`],
+    ["reviewer", "검수도 끝났습니다 ⚖️"],
+    ["pd", `다음 출근은 ${nextShift()}! 빈 회차 생기면 바로 채웁니다`]] });
+  ag.push({ who: ["pd", "gemini", "reviewer", "pixabay"], lines: [
+    ["pd", "📢 잠깐 기획 회의해요!"],
+    ["gemini", pickOne(["다음엔 전세 보증금 지키는 법 어때요?", "청약 가점 계산, 헷갈리는 사람 많아요", "건물주가 공실을 그냥 두는 이유도 재밌을 것 같아요", "경매 입문자가 많이 하는 실수 3가지!"])],
+    ["reviewer", "세율 같은 숫자는 공식 자료로 꼭 확인할게요"],
+    ["pixabay", "어울리는 아파트 · 상가 영상 미리 찾아 둘게요 📷"],
+    ["pd", "회의 끝! 각자 자리로~"]] });
+  return pickOne(ag);
+}
+async function holdMeeting() {
+  if (meetingOn || fast || document.hidden || isWorking() || nightNow()) return;
+  const a = meetingAgenda();
+  const ps = a.who.map(id => people[id]).filter(p => p && !p.wk && !p.busy && p !== recording);
+  if (ps.length < 3 || !ps.includes(people.pd)) return;
+  meetingOn = true;
+  const pd = people.pd; pd.busy = true;
+  $("sign-plan").classList.add("on"); $("hl-plan").classList.add("on"); updateNight();
+  const z = ROOMS.plan;
+  follow(z.x + z.w / 2);
+  try {
+    await goTo(pd, { x: z.x + z.w * .64 + 48, y: z.y + 200, zone: "plan" });
+    for (const [id, text] of a.lines) {
+      if (isWorking() || fast) break;
+      const p = people[id];
+      if (!ps.includes(p)) continue;
+      say(p, text, "", 4200);
+      await sleep(4700);
+    }
+  } finally {
+    meetingOn = false;
+    if (curStage !== "plan") { $("sign-plan").classList.remove("on"); $("hl-plan").classList.remove("on"); }
+    updateNight();
+    goHome(pd).finally(() => { pd.busy = false; });
+  }
+}
+function meetingLoop() {
+  setTimeout(meetingLoop, (5 + Math.random() * 4) * 60e3);
+  if (!queue.length && !playing) holdMeeting();
+}
+
+/* ===================== 데모 (?demo) ===================== */
+let demoT0 = null, demoJ = null;
+function demoState() {
+  const now = Date.now();
+  if (!demoT0) demoT0 = now;
+  const iso = ms => new Date(ms).toISOString();
+  const day0 = (() => { const d = kst(now); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - 9 * 3600e3; })();
+  const tmr = day0 + 24 * 3600e3, pubAt = iso(tmr + 7 * 3600e3), PA = fmtDT(pubAt);
+  if (!demoJ) demoJ = pickOne(["Kore", "Aoede", "Leda", "Puck"]);
+  const J = demoJ, TITLE = "경매 낙찰받고도 집을 못 받는 이유";
+  const script = [
+    ["ops", "actions", "사무실 문 열었습니다! 오늘 접수 건 확인할게요 🔑", "setup", "start"],
+    ["ops", "pd", "만들 회차 1개: " + PA, "setup"],
+    ["ops", "pd", PA + " 공개분 작업 착수합니다!", "ops"],
+    ["idea", "discord", "상담 창구 접수함 확인할게요! 대표님 아이디어 들어온 거 있나…", "idea"],
+    ["idea", "discord", "대표님 아이디어 접수! \"낙찰받았는데 세입자가 안 나가면?\"", "idea", "report"],
+    ["plan", "pd", "이번 건은 '경매·공매'로 갑니다!", "plan"],
+    ["plan", "gemini", "주제 확정: 경매 낙찰 후 대항력 있는 임차인이 있으면 생기는 일", "plan"],
+    ["script", "gemini", "카피 쓰기 시작합니다 ✍️", "script"],
+    ["script", "gemini", "첫 문장은 \"낙찰받았는데 집에 못 들어간다고요?\"", "script"],
+    ["review", "reviewer", "초안 받았습니다. 법·제도 오류랑 과장 표현 검수할게요 🔍", "review"],
+    ["review", "reviewer", "수정: '무조건 내보낼 수 있다' → '인도명령을 신청할 수 있다'로 고쳤어요", "review"],
+    ["review", "reviewer", `검수 끝! 제목 '${TITLE}', 문장 8개로 확정`, "review"],
+    ["voice", "pd", "녹음실 준비 완료! 오늘 낭독할 성우를 뽑을게요 🎙", "voice"],
+    ["voice", J, "제가 낭독 맡았어요! 녹음 시작합니다", "voice"],
+    ["edit", "whisper", "싱크 완료! 대본 일치율 96%", "voice"],
+    ["footage", "pixabay", "배경 영상 8장면 찾으러 갑니다!", "footage"],
+    ["footage", "pixabay", "[1/8] 'court auction gavel' 장면 확보!", "footage"],
+    ["footage", "pixabay", "[5/8] 'apartment door keys' 장면 확보!", "footage"],
+    ["footage", "pixabay", "[8/8] 'moving boxes apartment' 장면 확보!", "footage"],
+    ["edit", "ffmpeg", "장면 이어 붙이는 중 (부드러운 전환 효과)", "edit"],
+    ["edit", "ffmpeg", "자막 입히고 최종 렌더링 들어갑니다 🎞", "edit"],
+    ["edit", "ffmpeg", "영상 완성! 34.2초짜리 쇼츠 나왔습니다", "edit"],
+    ["publish", "youtube", "유튜브에 올리는 중이에요 📤", "publish"],
+    ["publish", "youtube", "업로드 100%! 공개 설정 확인할게요", "publish"],
+    ["publish", "youtube", "대표님! " + PA + " 공개 예약 완료했습니다 🎉", "publish", "report"],
+    ["ops", "pd", "오늘 업무 마감! 다들 수고 많았어요 🏠", "idle", "end"],
+  ];
+  const at = Math.max(0, Math.min(script.length - 1, (+params.get("at") || 1) - 1));   // ?demo&at=10 → 10번째 줄부터 (점검용)
+  const step = 7000, n = Math.min(script.length, Math.floor((now - demoT0) / step) + 1 + at);
+  if (now - demoT0 > step * (script.length - at + 8)) { demoT0 = now; demoJ = null; }
+  const log = script.slice(0, n).map(([dept, who, msg, stage, kind], i) => ({ t: iso(demoT0 - (at - i) * step), dept, who, msg, stage, kind: kind || "work" }));
+  const done = n === script.length;
+  const cur = { slot: "morning", publish_at: pubAt, todo: [PA] };
+  if (n > 4) cur.idea = "낙찰받았는데 세입자가 안 나가면?";
+  if (n > 5) { cur.category = "auction"; cur.label = "경매·공매"; }
+  if (n > 6) cur.topic = "경매 낙찰 후 대항력 있는 임차인이 있으면 생기는 일";
+  if (n > 11) cur.title = TITLE;
+  if (n > 13) cur.voice = J;
+  if (n > 15) cur.progress = Math.min(1, (n - 16) / 3);
+  const upcoming = [];
+  if (now < day0 + 21 * 3600e3) upcoming.push({ publish_at: iso(day0 + 21 * 3600e3), category: "contract", label: "계약·매매 상식", title: "전세 계약 전 등기부등본, 이 3곳만 보세요" });
+  if (n > 24) upcoming.push({ publish_at: pubAt, category: "auction", label: "경매·공매", title: TITLE });
+  upcoming.push({ publish_at: iso(tmr + 12 * 3600e3), category: "landlord", label: "건물주의 세계", title: "건물주가 공실을 그냥 두는 진짜 이유" },
+    { publish_at: iso(tmr + 18 * 3600e3), category: "subscription", label: "청약·전월세", title: "청약 가점, 이것 모르면 손해예요" });
+  return {
+    updated: iso(now), stage: log[log.length - 1].stage, run: { status: done ? "done" : "working", started: iso(demoT0) },
+    current: done ? {} : cur, log,
+    stats: { at: iso(now - 40 * 60e3), subs: 64, views: 15320, videos: 18, shorts_views: 15320, shorts_likes: 212,
+      started: (() => { const d = kst(now - 7 * 86400e3); return `${d.getUTCFullYear()}-${z2(d.getUTCMonth() + 1)}-${z2(d.getUTCDate())}`; })(),
+      days: 8, subs_per_day: 8.0, subs_per_day_7d: 9.1, top: [
+      { id: "dQw4w9WgXcQ", title: "토지 살 때 '맹지' 조심해야 하는 이유", views: 2140 },
+      { id: "", title: "상가 권리금, 법으로 보호받을까?", views: 1385 },
+      { id: "", title: "집주인 몰래 5년치 월세 돌려받는 연말정산 꿀팁", views: 912 }] },
+    stats_hist: [{ d: "어제", subs: 55, views: 13100 }, { d: "오늘", subs: 64, views: 15320 }],
+    board: { total: 18, upcoming,
+      published: [{ publish_at: iso(now - 3 * 3600e3), category: "land", label: "토지", title: "토지 살 때 '맹지' 조심해야 하는 이유", video_id: "dQw4w9WgXcQ" },
+                  { publish_at: iso(now - 9 * 3600e3), category: "commercial", label: "건물·상가", title: "상가 권리금, 법으로 보호받을까?", video_id: "" },
+                  { publish_at: iso(now - 15 * 3600e3), category: "tax", label: "세금·정책", title: "양도세 비과세, 2년 보유만 하면 끝?", video_id: "" }] },
+  };
+}
+
+matchMedia("(max-width: 820px)").addEventListener("change", () => location.reload());
+
+/* ===================== 앱 설치 (PWA) ===================== */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("/sw.js").catch(() => {});
+let installEvt = null;
+const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+function syncInstall() { $("installBtn").style.display = standalone() ? "none" : ""; }
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; syncInstall(); });
+addEventListener("appinstalled", () => { installEvt = null; $("installTip").classList.remove("show"); syncInstall(); });
+matchMedia("(display-mode: standalone)").addEventListener?.("change", syncInstall);
+function showTip(h) { const t = $("installTip"); t.innerHTML = h + `<button type="button" id="tipClose">알겠어요</button>`; t.classList.add("show"); $("tipClose").onclick = () => t.classList.remove("show"); }
+$("installBtn").addEventListener("click", async () => {
+  if (installEvt) {
+    installEvt.prompt();
+    try { await installEvt.userChoice; } catch {}
+    installEvt = null; syncInstall(); return;
+  }
+  if (isIOS) showTip(`📲 <b>홈 화면에 앱으로 추가하기</b><br>Safari 아래쪽 <b>공유 버튼(□↑)</b> → <b>'홈 화면에 추가'</b>를 눌러 주세요.`);
+  else showTip(`📲 <b>앱으로 설치하기</b><br>브라우저 메뉴(<b>⋮</b>)에서 <b>'앱 설치'</b> 또는 <b>'홈 화면에 추가'</b>를 눌러 주세요.`);
+});
+syncInstall();
+
+/* ===================== 시작 ===================== */
+buildOffice();
+fit();
+addEventListener("resize", fit);
+setStage("idle");
+renderBoard();
+function tick() {
+  const d = kst(Date.now());
+  $("clock").textContent = `🕒 ${z2(d.getUTCHours())}:${z2(d.getUTCMinutes())} KST`;
+  if (state) { renderStatus(); if (!fast) { renderBoard(); renderProject(); } }
+  updateNight();
+}
+tick(); setInterval(tick, 20000);
+poll();
+setTimeout(idleLife, 2500);
+setTimeout(() => { if (!queue.length && !playing) holdMeeting(); setTimeout(meetingLoop, 5 * 60e3); }, 60e3);
+</script>
+</body>
+</html>
