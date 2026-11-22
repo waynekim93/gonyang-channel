@@ -1,7 +1,7 @@
 {
-  "name": "부지런 AI 일터",
-  "short_name": "부지런 일터",
-  "description": "부지런 공인중개사무소 — 부동산 쇼츠 자동화가 지금 뭘 하는지 실시간으로",
+  "name": "고냥이 AI 일터",
+  "short_name": "고냥이 일터",
+  "description": "고냥이 집사 사무소 — 고양이 쇼츠 자동화가 지금 뭘 하는지 실시간으로",
   "lang": "ko",
   "start_url": "/office",
   "scope": "/",

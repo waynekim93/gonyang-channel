@@ -120,7 +120,7 @@ def _channel_stats():
                    "shorts_views": sum(v["views"] for v in vids), "shorts_likes": sum(v["likes"] for v in vids)}
     # 자동화 시작일(첫 업로드) · 하루 평균 구독자 증가 (시작 때 구독자 0명 기준 + 최근 7일)
     first = min((h.get("publish_at") or h.get("date") or "") for h in hist if h.get("video_id"))[:10] if titles else ""
-    st["stats"]["started"] = first or "2026-11-20"
+    st["stats"]["started"] = first or "2026-11-22"
     days = max(1, (datetime.now(KST).date() - datetime.fromisoformat(st["stats"]["started"]).date()).days + 1)
     st["stats"]["days"] = days
     st["stats"]["subs_per_day"] = round(subs / days, 1)
@@ -194,7 +194,7 @@ def finish(status: str):
     st["board"] = _schedule_board()
     st["current"] = {}
     _channel_stats()
-    report("ops", "오늘 업무 마감! 다들 수고 많았어요 🏠" if ok else "문제가 있었어요. 대표님 디스코드로 알림 갔습니다 💦",
+    report("ops", "오늘 업무 마감! 다들 수고 많았어요 🐾" if ok else "문제가 있었어요. 대표님 디스코드로 알림 갔습니다 💦",
            "pd", stage="idle", kind="end" if ok else "error")
 
 

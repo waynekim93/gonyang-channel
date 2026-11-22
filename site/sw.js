@@ -1,6 +1,6 @@
-// 부지런 AI 일터 — 앱 설치용 서비스 워커. 화면 파일은 네트워크 우선(새 버전 바로 반영), 꺼져 있으면 저장본.
+// 고냥이 AI 일터 — 앱 설치용 서비스 워커. 화면 파일은 네트워크 우선(새 버전 바로 반영), 꺼져 있으면 저장본.
 // 실시간 현황(api.github.com Gist)은 다른 주소라 건드리지 않음.
-const CACHE = "buzirun-office-v1";
+const CACHE = "gonyang-office-v1";
 const SHELL = ["/office", "/fonts/Pretendard-ExtraBold.otf", "/icons/icon-192.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", (e) => {
