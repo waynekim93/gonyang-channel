@@ -109,5 +109,24 @@
    "pixabay:168345",
    "pixabay:168347"
   ]
+ },
+ {
+  "date": "2026-11-23T11:26+09:00",
+  "slot": "noon",
+  "category": "food",
+  "topic": "밥그릇 바닥에 밥을 꼭 한 숟갈씩 남기는 고양이의 반전 속마음",
+  "title": "고양이 밥 남기는 이유",
+  "file": "20261123_1126_noon_고양이_밥_남기는_이유.mp4",
+  "video_id": "Ngi3mQqZdfI",
+  "cta": "save",
+  "publish_at": "2026-11-24T12:00:00+09:00",
+  "clips": [
+   "pixabay:368178",
+   "pixabay:2879",
+   "pixabay:291628",
+   "pixabay:133587",
+   "pixabay:4916",
+   "pixabay:110759"
+  ]
  }
 ]
