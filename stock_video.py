@@ -7,6 +7,7 @@
 import json
 import os
 import random
+import time
 import re
 from pathlib import Path
 
@@ -39,16 +40,29 @@ def _recent_ids() -> set[str]:
     return {c for h in history[-RECENT_VIDEOS:] for c in h.get("clips", [])} | set(PICKED)
 
 
-def _download(url: str, path) -> str:
+def _download(url: str, path, tries: int = 5) -> str:
+    """받기. Pixabay CDN이 429(요청 과다)를 주면 기다렸다가 다시 (11/22 투게독 닥스훈트 영상이 이것 때문에 빈 화면이 됨)."""
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
-        with requests.get(url, stream=True, timeout=90, headers={"User-Agent": "Mozilla/5.0"}) as d:
-            d.raise_for_status()
-            tmp = path.with_suffix(".part")
-            with open(tmp, "wb") as out:
-                for chunk in d.iter_content(1 << 20):
-                    out.write(chunk)
-            tmp.replace(path)
+        for n in range(tries):
+            try:
+                with requests.get(url, stream=True, timeout=90, headers={"User-Agent": "Mozilla/5.0"}) as d:
+                    if d.status_code in (429, 500, 502, 503) and n < tries - 1:
+                        wait = min(int(d.headers.get("Retry-After", 0) or 0), 60) or 8 * (2 ** n)
+                        print(f"    (받기 {d.status_code} → {wait}초 뒤 다시)")
+                        time.sleep(wait)
+                        continue
+                    d.raise_for_status()
+                    tmp = path.with_suffix(".part")
+                    with open(tmp, "wb") as out:
+                        for chunk in d.iter_content(1 << 20):
+                            out.write(chunk)
+                    tmp.replace(path)
+                    break
+            except (requests.ConnectionError, requests.Timeout):
+                if n == tries - 1:
+                    raise
+                time.sleep(5)
     return str(path)
 
 
@@ -244,7 +258,14 @@ def _take(cand, used) -> str:
     PICKED.append(f"pixabay:{h['id']}")
     if h.get("_anim"):
         ANIM_USED[0] += 1
-    return _download(v["url"], CACHE / "pixabay" / f"{h['id']}_{v['width']}x{v['height']}.mp4")
+    others = sorted((x for x in h["videos"].values() if x.get("url") and x["url"] != v["url"]),
+                    key=lambda x: x["width"], reverse=True)
+    for f in [v, *others]:  # 큰 화질이 계속 막히면 작은 화질로라도
+        try:
+            return _download(f["url"], CACHE / "pixabay" / f"{h['id']}_{f['width']}x{f['height']}.mp4")
+        except requests.RequestException as e:
+            print(f"    (영상 {h['id']} {f['width']}px 받기 실패: {str(e)[:80]})")
+    raise requests.RequestException(f"영상 {h['id']} 받기 실패")
 
 
 def _lang(q: str) -> str:
@@ -424,8 +445,14 @@ def _breed_clip(breed: str, used, min_sec, key, context: str) -> str | None:
                 continue
             pick = pool[idx if idx is not None else 0]
             if kind == "video":
+                try:
+                    path = _take(pick, used)
+                except requests.RequestException:  # 받기가 계속 막히면 사진 등 다른 후보로
+                    print(f"    ✘ {breed} 영상 받기 실패 → 다른 영상·사진으로")
+                    rejected.add((kind, pick[3]["id"]))
+                    continue
                 print(f"    🐱 {breed} 영상 사용")
-                return _take(pick, used)
+                return path
             h = pick[3]
             used.add(("pixabay-img", h["id"]))
             PICKED.append(f"pixabay-img:{h['id']}")
@@ -435,7 +462,45 @@ def _breed_clip(breed: str, used, min_sec, key, context: str) -> str | None:
     return None
 
 
-def fetch_clip(query: str, used: set, min_sec: float = 0, context: str = "", breed: str = "") -> str | None:
+def _any_fallback_clip(used, min_sec, key) -> str | None:
+    """마지막 안전망 — 장면에 맞는 영상이 하나도 없거나 받기가 계속 막혀도 빈 화면(그라데이션) 대신
+    고양이 관련 아무 영상 · 사진(일러스트 포함)을 씀. 판단 없이, 최근에 쓴 것도 허용."""
+    want = {'cat', 'cats', 'kitten', 'kittens', 'kitty', 'feline'}
+    ok = lambda h: (not want or _tag_words(h.get("tags", "").lower()) & want)  # noqa: E731
+    for q in ['cat', 'kitten', 'cute cat', 'cat sleeping']:
+        for vtype in ("film", "all"):
+            r = requests.get("https://pixabay.com/api/videos/", timeout=20,
+                             params={"key": key, "q": q, "per_page": 100, "safesearch": "true",
+                                     "order": "popular", "video_type": vtype})
+            r.raise_for_status()
+            hits = [h for h in r.json().get("hits", [])
+                    if ("pixabay", h["id"]) not in used and _best_file(h) and ok(h)]
+            hits.sort(key=lambda h: h.get("duration", 0) >= min_sec, reverse=True)
+            top = hits[:15]
+            random.shuffle(top)
+            for h in top[:4]:
+                try:
+                    path = _take((0, 0, 0, h, _best_file(h)), used)
+                except requests.RequestException:
+                    continue
+                print(f"    🎞 맞는 영상이 없어 일반 고양이 영상으로 ({q})")
+                return path
+    for q in ['cat', 'kitten', 'cat illustration']:
+        r = requests.get("https://pixabay.com/api/", timeout=20,
+                         params={"key": key, "q": q, "per_page": 100, "safesearch": "true",
+                                 "order": "popular", "image_type": "all", "orientation": "vertical"})
+        r.raise_for_status()
+        hits = [h for h in r.json().get("hits", []) if ("pixabay-img", h["id"]) not in used and ok(h)]
+        if hits:
+            h = random.choice(hits[:20])
+            used.add(("pixabay-img", h["id"]))
+            img = Path(_download(h.get("largeImageURL") or h["webformatURL"], CACHE / "pixabay_img" / f"{h['id']}.jpg"))
+            print(f"    🎞 맞는 영상이 없어 일반 고양이 사진·일러스트로 ({q})")
+            return _photo_clip(img, min_sec)
+    return None
+
+
+def _fetch_clip_main(query: str, used: set, min_sec: float = 0, context: str = "", breed: str = "") -> str | None:
     """검색어에 맞는 영상 1개를 받아 로컬 경로 반환 (없으면 None → 그라데이션 배경).
     context = 영상 제목 + 이 장면의 문장 — 있으면 Gemini가 내용에 맞는 영상을 고름.
     breed = 이 장면의 품종(한국어, detect_breed) — 있으면 그 품종 영상·사진만.
@@ -483,4 +548,23 @@ def fetch_clip(query: str, used: set, min_sec: float = 0, context: str = "", bre
                 if scored:
                     print(f"    (일반 고양이 검색 '{q}' 로 대체)")
                     return _take(random.choice(scored[:6]), used)
+    return None
+
+
+def fetch_clip(query: str, used: set, min_sec: float = 0, context: str = "", breed: str = "") -> str | None:
+    """장면에 맞는 영상 → 없으면 일반 고양이 영상 · 사진 (빈 화면은 마지막 수단)."""
+    try:
+        path = _fetch_clip_main(query, used, min_sec, context, breed)
+    except requests.RequestException as e:  # 받기 실패가 새어 나와도 안전망으로
+        print(f"    (영상 찾기·받기 실패: {str(e)[:100]})")
+        path = None
+    if path:
+        return path
+    load_env()
+    key = os.environ.get("PIXABAY_API_KEY")
+    if key:
+        try:
+            return _any_fallback_clip(used, min_sec, key)
+        except Exception as e:
+            print(f"    (일반 고양이 찾기 실패: {str(e)[:100]})")
     return None
