@@ -242,5 +242,24 @@
    "pixabay:46230",
    "pixabay:49370"
   ]
+ },
+ {
+  "date": "2026-11-25T06:00+09:00",
+  "slot": "morning",
+  "category": "jipsa",
+  "topic": "고양이가 집사 키보드 위에 굳이 올라와 눕는 의외의 반전 이유",
+  "title": "고양이가 키보드 위에 눕는 이유",
+  "file": "20261125_0600_morning_고양이가_키보드_위에_눕는_이유.mp4",
+  "video_id": "j6ocKTDcTLE",
+  "cta": "debate",
+  "publish_at": "2026-11-26T07:00:00+09:00",
+  "clips": [
+   "pixabay:39010",
+   "pixabay:2449",
+   "pixabay:35693",
+   "pixabay:305734",
+   "pixabay:379435",
+   "pixabay:95540"
+  ]
  }
 ]
