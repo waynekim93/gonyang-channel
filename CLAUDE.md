@@ -35,7 +35,7 @@
 | `healthcheck.py` · `health.yml` | 빈 회차 감시 |
 | `youtube_uploader.py` · `auth_login.py` | 업로드(categoryId 15 애완동물) · 최초 로그인 |
 | `settings.py` | 비밀값: 환경변수 → `.env` → `~/.gonyang/channel/*` |
-| `office.py` · `site/` | AI 일터(고양이 버전, 비밀 Gist c0da…) · 브랜딩 페이지 · 배포 `vercel deploy --prod --global-config ~/.buzirun/vercel` (프로젝트 gonyang-cat) |
+| `office.py` · `site/` | AI 일터(고양이 버전, 비밀 Gist c0da…) · 브랜딩 페이지 · 배포 `vercel deploy --prod --global-config ~/.buzirun/vercel` (프로젝트 gonyang-cat) — **반드시 `site` 폴더 안에서** 실행(루트에서 하면 파이썬으로 인식돼 실패하고 빈 프로젝트가 새로 생김) |
 
 ## 카테고리 (같은 카테고리 연달아 금지, 묶음 필수/궁금/재미 섞기)
 필수: health 건강·이상신호 · food 사료·간식 · care 초보집사·돌봄 · danger 위험한 것·안전 / 궁금: behavior 행동·속마음 · breed 품종·성격 / 재미: trivia 고양이 잡학 · jipsa 집사의 세계
