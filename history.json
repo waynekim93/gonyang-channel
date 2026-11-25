@@ -281,5 +281,61 @@
    "pixabay:95538",
    "pixabay:95541"
   ]
+ },
+ {
+  "date": "2026-11-25T16:51+09:00",
+  "slot": "night",
+  "category": "food",
+  "topic": "습식사료에 물을 타서 주면 생기는 의외의 변화",
+  "title": "고양이 습식사료에 물을 타면 생기는 일",
+  "file": "20261125_1651_night_고양이_습식사료에_물을_타면_생기는_일.mp4",
+  "video_id": "oNi-cT3wJO0",
+  "cta": "save",
+  "publish_at": "2026-11-25T20:00:00+09:00",
+  "clips": [
+   "pixabay:46320",
+   "pixabay:57866",
+   "pixabay:94093",
+   "pixabay:213870",
+   "pixabay:32034",
+   "pixabay:375776"
+  ]
+ },
+ {
+  "date": "2026-11-25T16:59+09:00",
+  "slot": "late",
+  "category": "behavior",
+  "topic": "고양이가 꼬리를 바짝 세우고 다가와 부르르 떠는 진짜 이유",
+  "title": "고양이가 꼬리를 바짝 세우고 다가와 부르르 떠는 진짜 이유",
+  "file": "20261125_1659_late_고양이가_꼬리를_바짝_세우고_다가와_부르르_떠는_진짜_이유.mp4",
+  "video_id": "pb6aDZVSLq4",
+  "cta": "debate",
+  "publish_at": "2026-11-25T22:00:00+09:00",
+  "clips": [
+   "pixabay:216828",
+   "pixabay:83808",
+   "pixabay:22835",
+   "pixabay:3740",
+   "pixabay:132493"
+  ]
+ },
+ {
+  "date": "2026-11-25T17:09+09:00",
+  "slot": "evening",
+  "category": "danger",
+  "topic": "고양이 있는 집에 '디퓨저'나 '아로마 향초'를 함부로 두면 안 되는 의외의 반전 이유",
+  "title": "고양이 디퓨저 아로마 향초가 위험한 이유",
+  "file": "20261125_1709_evening_고양이_디퓨저_아로마_향초가_위험한_이유.mp4",
+  "video_id": "2kC6L-QVBEY",
+  "cta": "subscribe",
+  "publish_at": "2026-11-26T18:00:00+09:00",
+  "clips": [
+   "pixabay:4915",
+   "pixabay:364742",
+   "pixabay:90984",
+   "pixabay:133585",
+   "pixabay:139549",
+   "pixabay:202831"
+  ]
  }
 ]
