@@ -1,7 +1,7 @@
 """고냥이 채널 완전 자동: 주제 선정(디스코드 아이디어 우선) → (선택) 사실 확인 → 대본 → 검수 → 영상 → 예약 업로드 → 기록.
 부지런(buzirun-channel) 시스템을 그대로 복사해 고양이용으로 고친 것 — 부지런 · 캄모니 · 투게독과 저장소 · 비밀값 모두 따로.
 
-  python autopilot.py --schedule        # 예약 대기열 채우기 (07:00 / 12:00 / 18:00 / 21:00 KST) — 자동 실행은 이것
+  python autopilot.py --schedule        # 예약 대기열 채우기 (12:00 / 18:00 / 20:00 / 22:00 KST) — 자동 실행은 이것
   python autopilot.py --plan            # 만들 회차 수만 출력
   python autopilot.py --no-upload       # 업로드 없이 1편 시험 제작
   python autopilot.py --category health --topic "..."   # 카테고리 · 주제 지정
@@ -86,14 +86,14 @@ CATEGORIES = {
 LABELS = {"behavior": "행동·속마음", "health": "건강·이상신호", "food": "사료·간식", "care": "초보집사·돌봄",
           "breed": "품종·성격", "danger": "위험한 것·안전", "trivia": "고양이 잡학", "jipsa": "집사의 세계"}
 SLOTS = {
-    "morning": ("아침 7시. 출근 · 등교길에 폰으로 보는 집사들 · 고양이 키울까 고민하는 사람들",
-                {"behavior": 2, "health": 2, "food": 3, "care": 3, "breed": 1, "danger": 3, "trivia": 1, "jipsa": 1}),
     "noon": ("점심 12시. 점심시간에 잠깐 쉬며 가볍게 보는 사람들",
              {"behavior": 3, "health": 1, "food": 1, "care": 1, "breed": 2, "danger": 1, "trivia": 3, "jipsa": 3}),
     "evening": ("저녁 6시. 퇴근길에 우리 냥이 생각하며 보는 집사들",
                 {"behavior": 3, "health": 3, "food": 2, "care": 2, "breed": 2, "danger": 2, "trivia": 1, "jipsa": 2}),
-    "night": ("밤 9시. 집에서 냥이와 함께 쉬며 여유 있게 보는 집사들",
-              {"behavior": 3, "health": 2, "food": 1, "care": 1, "breed": 2, "danger": 1, "trivia": 3, "jipsa": 3}),
+    "night": ("저녁 8시. 저녁 먹고 집에서 냥이와 함께 쉬며 보는 집사들",
+              {"behavior": 3, "health": 2, "food": 2, "care": 2, "breed": 2, "danger": 2, "trivia": 2, "jipsa": 2}),
+    "late": ("밤 10시. 하루를 마무리하며 냥이와 함께 여유 있게 보는 집사들",
+             {"behavior": 3, "health": 2, "food": 1, "care": 1, "breed": 2, "danger": 1, "trivia": 3, "jipsa": 3}),
 }
 BASE_TAGS = ["고양이", "고양이상식", "집사", "냥이", "고양이행동", "고냥이", "Shorts"]
 SUBSCRIBE = "https://www.youtube.com/@gonyangcat?sub_confirmation=1"
@@ -107,8 +107,8 @@ CTAS = {
     "save": ("마지막 문장은 '나중에 우리 냥이한테 필요할 때 보시게 저장해 두세요' 같은 저장 유도.", 1),
     "none": ("마지막 문장은 따로 행동을 권하지 말고, 여운이 남는 한 줄 정리로 끝내기.", 1),
 }
-# 유튜브 예약 공개 시각 (KST) — 하루 4편 07:00 / 12:00 / 18:00 / 21:00
-PUBLISH_TIMES = {"morning": (7, 0), "noon": (12, 0), "evening": (18, 0), "night": (21, 0)}
+# 유튜브 예약 공개 시각 (KST) — 하루 4편 12:00 / 18:00 / 20:00 / 22:00 (11/25 조회수 조사: 저녁이 아침보다 훨씬 잘 나와 아침 7시 폐지)
+PUBLISH_TIMES = {"noon": (12, 0), "evening": (18, 0), "night": (20, 0), "late": (22, 0)}
 HORIZON = timedelta(hours=26)    # 이 시간 안에 공개될 회차만 미리 만듦
 LEAD = timedelta(minutes=25)     # 1편 제작·업로드 여유
 SECONDS = 29                     # 쇼츠는 끝까지 보는 비율이 노출에 중요 — 35초 안팎 (11/22 시험: 35 로 두면 문장 8개·43초 → 29 로 낮춤)
@@ -128,11 +128,11 @@ def pick_category(slot: str, history: list[dict]) -> str:
 
 
 def current_slot(now: datetime) -> str:
-    if 4 <= now.hour < 10:
-        return "morning"
-    if 10 <= now.hour < 15:
+    if now.hour < 15:
         return "noon"
-    return "evening" if 15 <= now.hour < 19 else "night"
+    if now.hour < 19:
+        return "evening"
+    return "night" if now.hour < 21 else "late"
 
 
 def load_history() -> list[dict]:
