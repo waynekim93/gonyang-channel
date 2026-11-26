@@ -395,5 +395,62 @@
    "pixabay:213865",
    "pixabay:378422"
   ]
+ },
+ {
+  "date": "2026-11-26T23:33+09:00",
+  "slot": "evening",
+  "category": "jipsa",
+  "topic": "고양이가 새벽 4시만 되면 갑자기 우다다 뛰는 진짜 이유",
+  "title": "고양이가 새벽 4시에 우다다 뛰는 진짜 이유",
+  "file": "20261126_2333_evening_고양이가_새벽_4시에_우다다_뛰는_진짜_이유.mp4",
+  "video_id": "sFZKjTuOCyk",
+  "cta": "debate",
+  "publish_at": "2026-11-27T18:00:00+09:00",
+  "clips": [
+   "pixabay:129543",
+   "pixabay:234045",
+   "pixabay:374530",
+   "pixabay:227102",
+   "pixabay:60551"
+  ]
+ },
+ {
+  "date": "2026-11-26T23:41+09:00",
+  "slot": "night",
+  "category": "food",
+  "topic": "사료를 씹지도 않고 꿀꺽 삼켜버리는 고양이의 반전 이유",
+  "title": "고양이 사료 안 씹고 삼키는 놀라운 이유",
+  "file": "20261126_2341_night_고양이_사료_안_씹고_삼키는_놀라운_이유.mp4",
+  "video_id": "5JBv5HPkSdU",
+  "cta": "comment",
+  "publish_at": "2026-11-27T20:00:00+09:00",
+  "clips": [
+   "pixabay:31439",
+   "pixabay:278893",
+   "pixabay:39903",
+   "pixabay:378646",
+   "pixabay:155780",
+   "pixabay:201239",
+   "pixabay:277120"
+  ]
+ },
+ {
+  "date": "2026-11-26T23:56+09:00",
+  "slot": "late",
+  "category": "care",
+  "topic": "고양이가 화장실에서 볼일을 보고 나와서 집안이 떠나가라 우는 진짜 이유",
+  "title": "고양이가 화장실에서 울며 나오는 진짜 이유",
+  "file": "20261126_2356_late_고양이가_화장실에서_울며_나오는_진짜_이유.mp4",
+  "video_id": "03fUmdGLlg8",
+  "cta": "subscribe",
+  "publish_at": "2026-11-27T22:00:00+09:00",
+  "clips": [
+   "pixabay:95535",
+   "pixabay:129459",
+   "pixabay:293402",
+   "pixabay:137614",
+   "pixabay:118",
+   "pixabay:98654"
+  ]
  }
 ]
