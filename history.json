@@ -471,5 +471,62 @@
    "pixabay:32033",
    "pixabay:157363"
   ]
+ },
+ {
+  "date": "2026-11-27T23:26+09:00",
+  "slot": "evening",
+  "category": "health",
+  "topic": "고양이가 강아지처럼 입을 벌리고 헐떡이는 '개구호흡'의 의외의 반전 이유",
+  "title": "고양이 개구호흡 원인과 주의할 점",
+  "file": "20261127_2326_evening_고양이_개구호흡_원인과_주의할_점.mp4",
+  "video_id": "QNk4pqtdsDA",
+  "cta": "debate",
+  "publish_at": "2026-11-28T18:00:00+09:00",
+  "clips": [
+   "pixabay:210532",
+   "pixabay:78165",
+   "pixabay:15911",
+   "pixabay:142391",
+   "pixabay:337180",
+   "pixabay:125351"
+  ]
+ },
+ {
+  "date": "2026-11-27T23:41+09:00",
+  "slot": "night",
+  "category": "breed",
+  "topic": "샴 고양이 털 색깔이 겨울이 되거나 나이가 들수록 점점 까맣게 변하는 의외의 반전 이유",
+  "title": "샴 고양이 털색이 점점 어두워지는 이유",
+  "file": "20261127_2341_night_샴_고양이_털색이_점점_어두워지는_이유.mp4",
+  "video_id": "r1qdbdb9SOQ",
+  "cta": "none",
+  "publish_at": "2026-11-28T20:00:00+09:00",
+  "clips": [
+   "pixabay-img:1724788",
+   "pixabay-img:2432449",
+   "pixabay-img:1184785",
+   "pixabay-img:1325498",
+   "pixabay-img:1040725",
+   "pixabay-img:1648719"
+  ]
+ },
+ {
+  "date": "2026-11-27T23:53+09:00",
+  "slot": "late",
+  "category": "trivia",
+  "topic": "고양이가 물을 칠색팔색하며 극도로 싫어하는 의외의 역사적 반전 이유",
+  "title": "고양이가 물을 싫어하는 진짜 이유",
+  "file": "20261127_2353_late_고양이가_물을_싫어하는_진짜_이유.mp4",
+  "video_id": "2GGkrJEIZ6I",
+  "cta": "comment",
+  "publish_at": "2026-11-28T22:00:00+09:00",
+  "clips": [
+   "pixabay:182227",
+   "pixabay:265819",
+   "pixabay:331152",
+   "pixabay:366208",
+   "pixabay:95077",
+   "pixabay:365024"
+  ]
  }
 ]
